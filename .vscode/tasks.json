@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "prisma:generate",
+      "type": "shell",
+      "command": "npx",
+      "args": ["prisma", "generate"],
+      "options": {
+        "shell": {
+          "executable": "cmd.exe",
+          "args": ["/c"]
+        }
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "prisma:db-push",
+      "type": "shell",
+      "command": "npx",
+      "args": ["prisma", "db", "push"],
+      "options": {
+        "shell": {
+          "executable": "cmd.exe",
+          "args": ["/c"]
+        }
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "prisma:setup",
+      "dependsOrder": "sequence",
+      "dependsOn": ["prisma:db-push", "prisma:generate"],
+      "group": "build"
+    },
+    {
+      "label": "build",
+      "type": "typescript",
+      "tsconfig": "tsconfig.json",
+      "group": "build",
+      "dependsOn": "prisma:setup"
+    }
+  ]
+}

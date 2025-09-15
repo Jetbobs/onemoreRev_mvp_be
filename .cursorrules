@@ -1,0 +1,47 @@
+# ShareMelon Backend 프로젝트 규칙
+
+## 프로젝트 개요
+- NestJS + TypeScript + Prisma + MySQL 백엔드 프로젝트
+- API 버전 관리: v1
+- 인증/인가 시스템 포함
+
+## 코딩 스타일
+- TypeScript strict 모드 사용
+- ESLint + Prettier 설정 준수
+- 함수와 클래스는 PascalCase
+- 변수와 함수 매개변수는 camelCase
+- 상수는 UPPER_SNAKE_CASE
+
+## NestJS 컨벤션
+- 컨트롤러는 RESTful API 원칙 준수
+- DTO는 class-validator 데코레이터 사용
+- 서비스는 비즈니스 로직만 포함
+- 예외 처리는 적절한 HTTP 상태 코드 사용
+
+## Prisma 규칙
+- 스키마 변경 시 항상 nullable로 시작
+- force-reset 사용 금지 (기존 데이터 보존)
+- 마이그레이션 전에 npx prisma generate 실행
+- unique 제약조건은 신중하게 적용
+
+## API 문서화
+- 모든 엔드포인트에 Swagger 데코레이터 적용
+- DTO에 ApiProperty 데코레이터 필수
+- 에러 응답도 문서화
+
+## 보안 규칙
+- 비밀번호는 bcrypt로 해싱
+- 민감한 정보는 응답에서 제외
+- 입력 데이터 유효성 검사 필수
+
+## 파일 구조
+- src/common/: 공통 모듈 (decorators, filters, interceptors)
+- src/auth/: 인증 관련
+- src/users/: 사용자 관리
+- src/posts/: 게시글 관리
+- prisma/: 데이터베이스 스키마
+
+## 주석 규칙
+- 복잡한 비즈니스 로직에 한국어 주석
+- API 엔드포인트 설명은 한국어
+- TODO 주석은 꼭 해결하기
