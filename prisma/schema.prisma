@@ -12,13 +12,49 @@ datasource db {
 
 // User 모델
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
   name      String?
-  phone     String?  @unique
+  phone     String?   @unique
   password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // 관계
+  projects Project[]
+
+  @@map("users")
+}
+
+// Project 모델
+model Project {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  authorId    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 관계
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  revisions Revision[]
+
+  @@map("projects")
+}
+
+// Revision 모델
+model Revision {
+  id        Int      @id @default(autoincrement())
+  projectId Int
+  revNo     Int      // 프로젝트별 리비전 번호 (1부터 시작)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("users")
+  // 관계
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // 인덱스
+  @@index([projectId])
+  @@unique([projectId, revNo]) // 같은 프로젝트 내에서 rev_no는 유니크해야 함
+  @@map("revisions")
 }
