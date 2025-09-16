@@ -1,6 +1,6 @@
-# ShareMelon Backend
+# OneMoreRev Backend
 
-ShareMelon 프로젝트의 백엔드 API 서버입니다.
+OneMoreRev 프로젝트의 백엔드 API 서버입니다.
 
 ## 🚀 기술 스택
 
