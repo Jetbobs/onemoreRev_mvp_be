@@ -1,8 +1,11 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
+import { LoginResponseDto } from './dto/login-response.dto';
+import { LoginDto } from './dto/login.dto';
 import { SignupResponseDto } from './dto/signup-response.dto';
 import { SignupDto } from './dto/signup.dto';
+import { UserProfileDto } from './dto/user-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -59,6 +62,55 @@ export class AuthService {
       }
       throw error;
     }
+  }
+
+  async login(loginDto: LoginDto): Promise<LoginResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: loginDto.email },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('이메일 또는 비밀번호가 올바르지 않습니다.');
+    }
+
+    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('이메일 또는 비밀번호가 올바르지 않습니다.');
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      message: '로그인이 성공적으로 완료되었습니다.',
+      success: true,
+    };
+  }
+
+  async getUserProfile(userId: number): Promise<UserProfileDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('사용자 정보를 찾을 수 없습니다.');
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      message: '사용자 프로필을 성공적으로 조회했습니다.',
+      success: true,
+    };
   }
 
   async validateUser(email: string, password: string) {

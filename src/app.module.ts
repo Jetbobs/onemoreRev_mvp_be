@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaModule } from './prisma/prisma.module';
-import { UsersModule } from './users/users.module';
-import { PostsModule } from './posts/posts.module';
 import { AuthModule } from './auth/auth.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -13,9 +13,11 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'apitest'),
+      serveRoot: '/apitest',
+    }),
     PrismaModule,
-    UsersModule,
-    PostsModule,
     AuthModule,
   ],
   controllers: [AppController],

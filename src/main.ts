@@ -1,6 +1,7 @@
-import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as session from 'express-session';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -12,6 +13,20 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
     transform: true,
   }));
+
+  // 세션 설정
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET || 'sharemelon-secret-key',
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        secure: false, // HTTPS에서는 true로 설정
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 24시간
+      },
+    }),
+  );
 
   // CORS 설정
   app.enableCors({

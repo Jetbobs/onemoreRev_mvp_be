@@ -20,24 +20,5 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // 관계
-  posts Post[]
-
   @@map("users")
-}
-
-// Post 모델
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 관계
-  authorId Int
-  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
-
-  @@map("posts")
 }
