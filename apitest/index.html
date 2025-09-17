@@ -21,7 +21,8 @@
         h1 {
             color: #333;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
+            font-size: 0.7em;
         }
         .api-section {
             margin-bottom: 30px;
@@ -122,7 +123,7 @@
             background-color: #2d3748;
             border-radius: 5px;
             font-family: 'Courier New', monospace;
-            font-size: 12px;
+            font-size: 9.6px;
             color: #e2e8f0;
             white-space: pre-wrap;
             border: 1px solid #4a5568;
@@ -192,23 +193,110 @@
             background-color: #545b62;
         }
         
+        /* 좌우 분할 레이아웃 */
+        .code-response-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .code-section {
+            flex: 1;
+        }
+        
+        .response-section {
+            flex: 1;
+        }
+        
+        .response {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 9.6px;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            min-height: 100px;
+        }
+        
+        .response-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .status-code {
+            margin-top: 8px;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            display: inline-block;
+        }
+        
+        .status-code.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-code.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-code.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* Submit 버튼 스타일 */
+        .submit-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+        
+        .submit-button:active {
+            background-color: #004085;
+        }
+        
         /* 탭 스타일 */
         .tab-container {
             margin-bottom: 20px;
         }
         .tab-buttons {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
         .tab-button {
             background-color: #f8f9fa;
             border: 1px solid #ddd;
-            padding: 10px 20px;
+            padding: 5px 10px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 9.8px;
             color: #333;
             transition: all 0.3s ease;
         }
@@ -273,13 +361,21 @@
                     <label for="signup-password-confirm">비밀번호 확인:</label>
                     <input type="password" id="signup-password-confirm" value="password123" placeholder="위와 동일한 비밀번호를 입력해주세요">
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <span class="code-label">예제 코드</span>
-                    <button class="copy-btn" onclick="copyCode('signup-code')">복사</button>
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('signup-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="signup-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <span class="response-label">응답 결과</span>
+                        <div id="signup-response" class="response" style="display: none;"></div>
+                        <div id="signup-status" class="status-code" style="display: none;"></div>
+                    </div>
                 </div>
-                <div class="code-example" id="signup-code"></div>
-                <button onclick="signup()">회원가입</button>
-                <div id="signup-response" class="response" style="display: none;"></div>
+                <button class="submit-button" onclick="signup()">Run</button>
             </div>
         </div>
 
@@ -300,13 +396,21 @@
                     <label for="login-password">비밀번호:</label>
                     <input type="password" id="login-password" value="password123" placeholder="비밀번호를 입력해주세요">
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <span class="code-label">예제 코드</span>
-                    <button class="copy-btn" onclick="copyCode('login-code')">복사</button>
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('login-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="login-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <span class="response-label">응답 결과</span>
+                        <div id="login-response" class="response" style="display: none;"></div>
+                        <div id="login-status" class="status-code" style="display: none;"></div>
+                    </div>
                 </div>
-                <div class="code-example" id="login-code"></div>
-                <button onclick="login()">로그인</button>
-                <div id="login-response" class="response" style="display: none;"></div>
+                <button class="submit-button" onclick="login()">Run</button>
             </div>
         </div>
 
@@ -319,13 +423,21 @@
                     <span>/api/v1/user/profile</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/user/profile')">복사</button>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <span class="code-label">예제 코드</span>
-                    <button class="copy-btn" onclick="copyCode('profile-code')">복사</button>
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('profile-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="profile-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <span class="response-label">응답 결과</span>
+                        <div id="profile-response" class="response" style="display: none;"></div>
+                        <div id="profile-status" class="status-code" style="display: none;"></div>
+                    </div>
                 </div>
-                <div class="code-example" id="profile-code"></div>
-                <button onclick="getProfile()">프로필 조회</button>
-                <div id="profile-response" class="response" style="display: none;"></div>
+                <button class="submit-button" onclick="getProfile()">Run</button>
             </div>
         </div>
 
@@ -350,13 +462,21 @@
 - 협업 기능
 - 버전 제어</textarea>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <span class="code-label">예제 코드</span>
-                    <button class="copy-btn" onclick="copyCode('project-create-code')">복사</button>
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('project-create-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="project-create-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <span class="response-label">응답 결과</span>
+                        <div id="project-response" class="response" style="display: none;"></div>
+                        <div id="project-status" class="status-code" style="display: none;"></div>
+                    </div>
                 </div>
-                <div class="code-example" id="project-create-code"></div>
-                <button onclick="createProject()">프로젝트 생성</button>
-                <div id="project-response" class="response" style="display: none;"></div>
+                <button class="submit-button" onclick="createProject()">Run</button>
             </div>
         </div>
 
@@ -369,13 +489,21 @@
                     <span>/api/v1/project/list</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/project/list')">복사</button>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <span class="code-label">예제 코드</span>
-                    <button class="copy-btn" onclick="copyCode('project-list-code')">복사</button>
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('project-list-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="project-list-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <span class="response-label">응답 결과</span>
+                        <div id="project-list-response" class="response" style="display: none;"></div>
+                        <div id="project-list-status" class="status-code" style="display: none;"></div>
+                    </div>
                 </div>
-                <div class="code-example" id="project-list-code"></div>
-                <button onclick="getProjectList()">프로젝트 목록 조회</button>
-                <div id="project-list-response" class="response" style="display: none;"></div>
+                <button class="submit-button" onclick="getProjectList()">Run</button>
             </div>
         </div>
 
@@ -388,13 +516,21 @@
                     <span>/api/v1/logout</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/logout')">복사</button>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                    <span class="code-label">예제 코드</span>
-                    <button class="copy-btn" onclick="copyCode('logout-code')">복사</button>
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('logout-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="logout-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <span class="response-label">응답 결과</span>
+                        <div id="logout-response" class="response" style="display: none;"></div>
+                        <div id="logout-status" class="status-code" style="display: none;"></div>
+                    </div>
                 </div>
-                <div class="code-example" id="logout-code"></div>
-                <button onclick="logout()">로그아웃</button>
-                <div id="logout-response" class="response" style="display: none;"></div>
+                <button class="submit-button" onclick="logout()">Run</button>
             </div>
         </div>
     </div>
@@ -499,6 +635,29 @@
                     toast.remove();
                 }
             }, 3000);
+        }
+
+        // HTTP Status Code 표시 함수
+        function showStatusCode(statusElementId, status) {
+            const statusElement = document.getElementById(statusElementId);
+            statusElement.style.display = 'block';
+            
+            // status code에 따른 텍스트와 클래스 적용
+            statusElement.className = 'status-code';
+            
+            if (status === 0) {
+                statusElement.textContent = 'NETWORK ERROR';
+                statusElement.classList.add('error');
+            } else if (status >= 200 && status < 300) {
+                statusElement.textContent = `HTTP ${status}`;
+                statusElement.classList.add('success');
+            } else if (status >= 400) {
+                statusElement.textContent = `HTTP ${status}`;
+                statusElement.classList.add('error');
+            } else {
+                statusElement.textContent = `HTTP ${status}`;
+                statusElement.classList.add('info');
+            }
         }
 
         // 페이지 로드 시 초기 코드 생성
@@ -705,20 +864,22 @@ fetch(host + '/api/v1/logout', {
                  confirmPassword: passwordConfirm
              };
 
-             try {
-                 const response = await fetch(`${API_BASE}/signup`, {
-                     method: 'POST',
-                     headers: {
-                         'Content-Type': 'application/json',
-                     },
-                     body: JSON.stringify(data),
-                     credentials: 'include'
-                 });
-                 const result = await response.json();
-                 showResponse('signup-response', result, !response.ok);
-             } catch (error) {
-                 showResponse('signup-response', { error: error.message }, true);
-             }
+            try {
+                const response = await fetch(`${API_BASE}/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                showResponse('signup-response', result, !response.ok);
+                showStatusCode('signup-status', response.status);
+            } catch (error) {
+                showResponse('signup-response', { error: error.message }, true);
+                showStatusCode('signup-status', 0); // 네트워크 오류
+            }
          }
 
         async function login() {
@@ -738,8 +899,10 @@ fetch(host + '/api/v1/logout', {
                 });
                 const result = await response.json();
                 showResponse('login-response', result, !response.ok);
+                showStatusCode('login-status', response.status);
             } catch (error) {
                 showResponse('login-response', { error: error.message }, true);
+                showStatusCode('login-status', 0); // 네트워크 오류
             }
         }
 
@@ -751,8 +914,10 @@ fetch(host + '/api/v1/logout', {
                 });
                 const result = await response.json();
                 showResponse('profile-response', result, !response.ok);
+                showStatusCode('profile-status', response.status);
             } catch (error) {
                 showResponse('profile-response', { error: error.message }, true);
+                showStatusCode('profile-status', 0); // 네트워크 오류
             }
         }
 
@@ -773,8 +938,10 @@ fetch(host + '/api/v1/logout', {
                 });
                 const result = await response.json();
                 showResponse('project-response', result, !response.ok);
+                showStatusCode('project-status', response.status);
             } catch (error) {
                 showResponse('project-response', { error: error.message }, true);
+                showStatusCode('project-status', 0); // 네트워크 오류
             }
         }
 
@@ -786,8 +953,10 @@ fetch(host + '/api/v1/logout', {
                 });
                 const result = await response.json();
                 showResponse('project-list-response', result, !response.ok);
+                showStatusCode('project-list-status', response.status);
             } catch (error) {
                 showResponse('project-list-response', { error: error.message }, true);
+                showStatusCode('project-list-status', 0); // 네트워크 오류
             }
         }
 
@@ -799,8 +968,10 @@ fetch(host + '/api/v1/logout', {
                 });
                 const result = await response.json();
                 showResponse('logout-response', result, !response.ok);
+                showStatusCode('logout-status', response.status);
             } catch (error) {
                 showResponse('logout-response', { error: error.message }, true);
+                showStatusCode('logout-status', 0); // 네트워크 오류
             }
         }
     </script>
