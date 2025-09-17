@@ -48,6 +48,7 @@ model Revision {
   projectId   Int
   revNo       Int      // 프로젝트별 리비전 번호 (1부터 시작)
   description String?  @db.Text // 리비전 설명 (nullable)
+  status      String   @default("prepare") @db.VarChar(30) // 리비전 상태
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -58,4 +59,14 @@ model Revision {
   @@index([projectId])
   @@unique([projectId, revNo]) // 같은 프로젝트 내에서 rev_no는 유니크해야 함
   @@map("revisions")
+}
+
+// Track 모델
+model Track {
+  id        Int      @id @default(autoincrement())
+  name      String   @default("") @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tracks")
 }
