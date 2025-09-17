@@ -81,7 +81,7 @@ async function bootstrap() {
     customSiteTitle: 'OneMoreRev API Docs'
   });
 
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 4000;
   await app.listen(port);
   
   console.log(`🚀 OneMoreRev Backend Server is running on: http://localhost:${port}`);
