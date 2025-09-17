@@ -38,6 +38,7 @@ model Project {
   // 관계
   author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   revisions Revision[]
+  tracks    Track[]
 
   @@map("projects")
 }
@@ -53,7 +54,8 @@ model Revision {
   updatedAt   DateTime @updatedAt
 
   // 관계
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdTracks Track[] @relation("TrackCreatedRevision")
 
   // 인덱스
   @@index([projectId])
@@ -63,10 +65,21 @@ model Revision {
 
 // Track 모델
 model Track {
-  id        Int      @id @default(autoincrement())
-  name      String   @default("") @db.VarChar(100)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  name          String   @default("") @db.VarChar(100)
+  projectId     Int      // 프로젝트 ID (외래키)
+  createdRevNo  Int      // 생성된 리비전 번호
+  createdRevId  Int      // 생성된 리비전 ID (외래키)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 관계
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdRev  Revision @relation("TrackCreatedRevision", fields: [createdRevId], references: [id], onDelete: Cascade)
+
+  // 인덱스
+  @@index([projectId])
+  @@index([createdRevId])
 
   @@map("tracks")
 }
