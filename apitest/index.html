@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneMoreRev API 테스트</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .api-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .api-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .api-url {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #666;
+            background-color: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-bottom: 15px;
+            border-left: 3px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .http-method {
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 2px;
+            color: white;
+        }
+        .http-method.get {
+            background-color: #61affe;
+        }
+        .http-method.post {
+            background-color: #49cc90;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+         input, textarea {
+             width: 100%;
+             padding: 10px;
+             border: 1px solid #ddd;
+             border-radius: 4px;
+             font-size: 14px;
+             box-sizing: border-box;
+         }
+         input::placeholder, textarea::placeholder {
+             color: #999;
+             opacity: 0.7;
+         }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .error {
+            border-left-color: #e74c3c;
+            background-color: #fdf2f2;
+        }
+        .success {
+            border-left-color: #27ae60;
+            background-color: #f2fdf5;
+        }
+        
+        /* 탭 스타일 */
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab-button {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        .tab-button:hover {
+            background-color: #e9ecef;
+        }
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 OneMoreRev API 테스트</h1>
+        
+        <!-- 탭 버튼들 -->
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showTab('signup')">📝 회원가입</button>
+                <button class="tab-button" onclick="showTab('login')">🔐 로그인</button>
+                <button class="tab-button" onclick="showTab('logout')">🚪 로그아웃</button>
+                <button class="tab-button" onclick="showTab('profile')">👤 프로필 조회</button>
+                <button class="tab-button" onclick="showTab('project-create')">📁 프로젝트생성</button>
+                <button class="tab-button" onclick="showTab('project-list')">📋 프로젝트목록</button>
+            </div>
+        </div>
+
+        <!-- 회원가입 탭 -->
+        <div id="signup-tab" class="tab-content active">
+            <div class="api-section">
+                <div class="api-title">📝 회원가입</div>
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/v1/signup</span>
+                </div>
+                <div class="form-group">
+                    <label for="signup-name">이름:</label>
+                    <input type="text" id="signup-name" value="홍길동" placeholder="실명을 입력해주세요">
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">이메일:</label>
+                    <input type="email" id="signup-email" value="hong@example.com" placeholder="이메일 주소를 입력해주세요">
+                </div>
+                <div class="form-group">
+                    <label for="signup-phone">휴대폰:</label>
+                    <input type="text" id="signup-phone" value="010-1234-5678" placeholder="휴대폰 번호를 입력해주세요">
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">비밀번호:</label>
+                    <input type="password" id="signup-password" value="password123" placeholder="6자 이상의 비밀번호를 입력해주세요">
+                </div>
+                <div class="form-group">
+                    <label for="signup-password-confirm">비밀번호 확인:</label>
+                    <input type="password" id="signup-password-confirm" value="password123" placeholder="위와 동일한 비밀번호를 입력해주세요">
+                </div>
+                <button onclick="signup()">회원가입</button>
+                <div id="signup-response" class="response" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- 로그인 탭 -->
+        <div id="login-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-title">🔐 로그인</div>
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/v1/login</span>
+                </div>
+                <div class="form-group">
+                    <label for="login-email">이메일:</label>
+                    <input type="email" id="login-email" value="hong@example.com" placeholder="가입한 이메일 주소를 입력해주세요">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">비밀번호:</label>
+                    <input type="password" id="login-password" value="password123" placeholder="비밀번호를 입력해주세요">
+                </div>
+                <button onclick="login()">로그인</button>
+                <div id="login-response" class="response" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- 프로필 탭 -->
+        <div id="profile-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-title">👤 프로필 조회</div>
+                <div class="api-url">
+                    <span class="http-method get">GET</span>
+                    <span>/api/v1/user/profile</span>
+                </div>
+                <button onclick="getProfile()">프로필 조회</button>
+                <div id="profile-response" class="response" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- 프로젝트 생성 탭 -->
+        <div id="project-create-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-title">📁 프로젝트 생성</div>
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/v1/project/new</span>
+                </div>
+                <div class="form-group">
+                    <label for="project-name">프로젝트 이름:</label>
+                    <input type="text" id="project-name" value="새 프로젝트" placeholder="프로젝트 이름을 입력해주세요">
+                </div>
+                <div class="form-group">
+                    <label for="project-description">프로젝트 설명:</label>
+                    <textarea id="project-description" rows="3" placeholder="프로젝트에 대한 설명을 입력해주세요 (선택사항)">새로운 프로젝트를 시작합니다.
+주요 기능:
+- 리비전 관리
+- 협업 기능
+- 버전 제어</textarea>
+                </div>
+                <button onclick="createProject()">프로젝트 생성</button>
+                <div id="project-response" class="response" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- 프로젝트 목록 탭 -->
+        <div id="project-list-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-title">📋 프로젝트 목록</div>
+                <div class="api-url">
+                    <span class="http-method get">GET</span>
+                    <span>/api/v1/project/list</span>
+                </div>
+                <button onclick="getProjectList()">프로젝트 목록 조회</button>
+                <div id="project-list-response" class="response" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- 로그아웃 탭 -->
+        <div id="logout-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-title">🚪 로그아웃</div>
+                <div class="api-url">
+                    <span class="http-method get">GET</span>
+                    <span>/api/v1/logout</span>
+                </div>
+                <button onclick="logout()">로그아웃</button>
+                <div id="logout-response" class="response" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:4000/api/v1';
+
+        // 탭 전환 함수
+        function showTab(tabName) {
+            // 모든 탭 버튼에서 active 클래스 제거
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 모든 탭 콘텐츠에서 active 클래스 제거
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 클릭된 탭 버튼에 active 클래스 추가
+            event.target.classList.add('active');
+            
+            // 해당 탭 콘텐츠에 active 클래스 추가
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        function showResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `response ${isError ? 'error' : 'success'}`;
+            element.textContent = JSON.stringify(data, null, 2);
+        }
+
+         async function signup() {
+             const password = document.getElementById('signup-password').value;
+             const passwordConfirm = document.getElementById('signup-password-confirm').value;
+             
+             // 비밀번호 확인 검증
+             if (password !== passwordConfirm) {
+                 showResponse('signup-response', { error: '비밀번호가 일치하지 않습니다.' }, true);
+                 return;
+             }
+             
+             // 빈 필드 검증
+             const name = document.getElementById('signup-name').value.trim();
+             const email = document.getElementById('signup-email').value.trim();
+             const phone = document.getElementById('signup-phone').value.trim();
+             
+             if (!name || !email || !phone || !password) {
+                 showResponse('signup-response', { error: '모든 필드를 입력해주세요.' }, true);
+                 return;
+             }
+
+             const data = {
+                 name: name,
+                 email: email,
+                 phone: phone,
+                 password: password,
+                 confirmPassword: passwordConfirm
+             };
+
+             try {
+                 const response = await fetch(`${API_BASE}/signup`, {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify(data),
+                     credentials: 'include'
+                 });
+                 const result = await response.json();
+                 showResponse('signup-response', result, !response.ok);
+             } catch (error) {
+                 showResponse('signup-response', { error: error.message }, true);
+             }
+         }
+
+        async function login() {
+            const data = {
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                showResponse('login-response', result, !response.ok);
+            } catch (error) {
+                showResponse('login-response', { error: error.message }, true);
+            }
+        }
+
+        async function getProfile() {
+            try {
+                const response = await fetch(`${API_BASE}/user/profile`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                showResponse('profile-response', result, !response.ok);
+            } catch (error) {
+                showResponse('profile-response', { error: error.message }, true);
+            }
+        }
+
+        async function createProject() {
+            const data = {
+                name: document.getElementById('project-name').value,
+                description: document.getElementById('project-description').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/project/new`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                showResponse('project-response', result, !response.ok);
+            } catch (error) {
+                showResponse('project-response', { error: error.message }, true);
+            }
+        }
+
+        async function getProjectList() {
+            try {
+                const response = await fetch(`${API_BASE}/project/list`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                showResponse('project-list-response', result, !response.ok);
+            } catch (error) {
+                showResponse('project-list-response', { error: error.message }, true);
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch(`${API_BASE}/logout`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                showResponse('logout-response', result, !response.ok);
+            } catch (error) {
+                showResponse('logout-response', { error: error.message }, true);
+            }
+        }
+    </script>
+</body>
+</html>
