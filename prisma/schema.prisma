@@ -44,11 +44,12 @@ model Project {
 
 // Revision 모델
 model Revision {
-  id        Int      @id @default(autoincrement())
-  projectId Int
-  revNo     Int      // 프로젝트별 리비전 번호 (1부터 시작)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  projectId   Int
+  revNo       Int      // 프로젝트별 리비전 번호 (1부터 시작)
+  description String?  @db.Text // 리비전 설명 (nullable)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // 관계
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
