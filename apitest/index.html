@@ -68,16 +68,17 @@
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 2.5px;
             font-weight: bold;
             color: #555;
+            font-size: 9.8px;
         }
          input, textarea {
              width: 100%;
-             padding: 10px;
+             padding: 5px;
              border: 1px solid #ddd;
              border-radius: 4px;
-             font-size: 14px;
+             font-size: 9.8px;
              box-sizing: border-box;
          }
          input::placeholder, textarea::placeholder {
@@ -197,7 +198,7 @@
         .code-response-container {
             display: flex;
             gap: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 3.75px;
         }
         
         .code-section {
@@ -269,7 +270,7 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 2.5px;
         }
         
         .submit-button:hover {
@@ -286,7 +287,7 @@
         }
         .tab-buttons {
             display: flex;
-            gap: 5px;
+            gap: 2.5px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
@@ -335,7 +336,6 @@
         <!-- 회원가입 탭 -->
         <div id="signup-tab" class="tab-content active">
             <div class="api-section">
-                <div class="api-title">📝 회원가입</div>
                 <div class="api-url">
                     <span class="http-method post">POST</span>
                     <span>/api/v1/signup</span>
@@ -382,7 +382,6 @@
         <!-- 로그인 탭 -->
         <div id="login-tab" class="tab-content">
             <div class="api-section">
-                <div class="api-title">🔐 로그인</div>
                 <div class="api-url">
                     <span class="http-method post">POST</span>
                     <span>/api/v1/login</span>
@@ -417,7 +416,6 @@
         <!-- 프로필 탭 -->
         <div id="profile-tab" class="tab-content">
             <div class="api-section">
-                <div class="api-title">👤 프로필 조회</div>
                 <div class="api-url">
                     <span class="http-method get">GET</span>
                     <span>/api/v1/user/profile</span>
@@ -444,7 +442,6 @@
         <!-- 프로젝트 생성 탭 -->
         <div id="project-create-tab" class="tab-content">
             <div class="api-section">
-                <div class="api-title">📁 프로젝트 생성</div>
                 <div class="api-url">
                     <span class="http-method post">POST</span>
                     <span>/api/v1/project/new</span>
@@ -483,7 +480,6 @@
         <!-- 프로젝트 목록 탭 -->
         <div id="project-list-tab" class="tab-content">
             <div class="api-section">
-                <div class="api-title">📋 프로젝트 목록</div>
                 <div class="api-url">
                     <span class="http-method get">GET</span>
                     <span>/api/v1/project/list</span>
@@ -510,7 +506,6 @@
         <!-- 로그아웃 탭 -->
         <div id="logout-tab" class="tab-content">
             <div class="api-section">
-                <div class="api-title">🚪 로그아웃</div>
                 <div class="api-url">
                     <span class="http-method get">GET</span>
                     <span>/api/v1/logout</span>
