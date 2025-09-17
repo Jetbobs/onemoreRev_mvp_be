@@ -115,6 +115,83 @@
             background-color: #f2fdf5;
         }
         
+        /* 소스코드 박스 스타일 */
+        .code-example {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #2d3748;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            border: 1px solid #4a5568;
+            overflow-x: auto;
+        }
+        .code-example .method {
+            color: #68d391;
+            font-weight: bold;
+        }
+        .code-example .url {
+            color: #63b3ed;
+        }
+        .code-example .string {
+            color: #f687b3;
+        }
+        .code-example .number {
+            color: #f6ad55;
+        }
+        .code-example .boolean {
+            color: #68d391;
+        }
+        
+        .code-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .copy-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            float: right;
+            margin-top: 5px;
+        }
+        
+        .copy-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .copy-btn:active {
+            background-color: #004085;
+        }
+        
+        .api-url {
+            position: relative;
+        }
+        
+        .url-copy-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 2px;
+            padding: 2px 6px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        
+        .url-copy-btn:hover {
+            background-color: #545b62;
+        }
+        
         /* 탭 스타일 */
         .tab-container {
             margin-bottom: 20px;
@@ -174,6 +251,7 @@
                 <div class="api-url">
                     <span class="http-method post">POST</span>
                     <span>/api/v1/signup</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/signup')">복사</button>
                 </div>
                 <div class="form-group">
                     <label for="signup-name">이름:</label>
@@ -195,6 +273,11 @@
                     <label for="signup-password-confirm">비밀번호 확인:</label>
                     <input type="password" id="signup-password-confirm" value="password123" placeholder="위와 동일한 비밀번호를 입력해주세요">
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <span class="code-label">예제 코드</span>
+                    <button class="copy-btn" onclick="copyCode('signup-code')">복사</button>
+                </div>
+                <div class="code-example" id="signup-code"></div>
                 <button onclick="signup()">회원가입</button>
                 <div id="signup-response" class="response" style="display: none;"></div>
             </div>
@@ -207,6 +290,7 @@
                 <div class="api-url">
                     <span class="http-method post">POST</span>
                     <span>/api/v1/login</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/login')">복사</button>
                 </div>
                 <div class="form-group">
                     <label for="login-email">이메일:</label>
@@ -216,6 +300,11 @@
                     <label for="login-password">비밀번호:</label>
                     <input type="password" id="login-password" value="password123" placeholder="비밀번호를 입력해주세요">
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <span class="code-label">예제 코드</span>
+                    <button class="copy-btn" onclick="copyCode('login-code')">복사</button>
+                </div>
+                <div class="code-example" id="login-code"></div>
                 <button onclick="login()">로그인</button>
                 <div id="login-response" class="response" style="display: none;"></div>
             </div>
@@ -228,7 +317,13 @@
                 <div class="api-url">
                     <span class="http-method get">GET</span>
                     <span>/api/v1/user/profile</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/user/profile')">복사</button>
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <span class="code-label">예제 코드</span>
+                    <button class="copy-btn" onclick="copyCode('profile-code')">복사</button>
+                </div>
+                <div class="code-example" id="profile-code"></div>
                 <button onclick="getProfile()">프로필 조회</button>
                 <div id="profile-response" class="response" style="display: none;"></div>
             </div>
@@ -241,6 +336,7 @@
                 <div class="api-url">
                     <span class="http-method post">POST</span>
                     <span>/api/v1/project/new</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/project/new')">복사</button>
                 </div>
                 <div class="form-group">
                     <label for="project-name">프로젝트 이름:</label>
@@ -254,6 +350,11 @@
 - 협업 기능
 - 버전 제어</textarea>
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <span class="code-label">예제 코드</span>
+                    <button class="copy-btn" onclick="copyCode('project-create-code')">복사</button>
+                </div>
+                <div class="code-example" id="project-create-code"></div>
                 <button onclick="createProject()">프로젝트 생성</button>
                 <div id="project-response" class="response" style="display: none;"></div>
             </div>
@@ -266,7 +367,13 @@
                 <div class="api-url">
                     <span class="http-method get">GET</span>
                     <span>/api/v1/project/list</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/project/list')">복사</button>
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <span class="code-label">예제 코드</span>
+                    <button class="copy-btn" onclick="copyCode('project-list-code')">복사</button>
+                </div>
+                <div class="code-example" id="project-list-code"></div>
                 <button onclick="getProjectList()">프로젝트 목록 조회</button>
                 <div id="project-list-response" class="response" style="display: none;"></div>
             </div>
@@ -279,7 +386,13 @@
                 <div class="api-url">
                     <span class="http-method get">GET</span>
                     <span>/api/v1/logout</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/logout')">복사</button>
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <span class="code-label">예제 코드</span>
+                    <button class="copy-btn" onclick="copyCode('logout-code')">복사</button>
+                </div>
+                <div class="code-example" id="logout-code"></div>
                 <button onclick="logout()">로그아웃</button>
                 <div id="logout-response" class="response" style="display: none;"></div>
             </div>
@@ -288,6 +401,255 @@
 
     <script>
         const API_BASE = 'http://localhost:4000/api/v1';
+        const HOST = 'http://localhost:4000';
+
+        // 클립보드 복사 함수들
+        async function copyCode(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            try {
+                await navigator.clipboard.writeText(text);
+                showCopySuccess('코드가 클립보드에 복사되었습니다!');
+            } catch (err) {
+                // 폴백: 텍스트 선택 후 복사
+                fallbackCopyTextToClipboard(text);
+                showCopySuccess('코드가 클립보드에 복사되었습니다!');
+            }
+        }
+
+        async function copyUrl(url) {
+            // 호스트 부분 제외하고 /api부터만 복사
+            const apiPath = url; // 이미 '/api/v1/...' 형태로 전달됨
+            
+            try {
+                await navigator.clipboard.writeText(apiPath);
+                showCopySuccess('API 경로가 클립보드에 복사되었습니다!');
+            } catch (err) {
+                // 폴백: 텍스트 선택 후 복사
+                fallbackCopyTextToClipboard(apiPath);
+                showCopySuccess('API 경로가 클립보드에 복사되었습니다!');
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            
+            // 화면에서 숨기기
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Fallback: 복사 실패', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showCopySuccess(message) {
+            // 기존 토스트가 있다면 제거
+            const existingToast = document.querySelector('.copy-toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            // 새 토스트 생성
+            const toast = document.createElement('div');
+            toast.className = 'copy-toast';
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background-color: #28a745;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 5px;
+                font-size: 14px;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            `;
+
+            // 애니메이션 CSS 추가
+            if (!document.querySelector('#toast-animation')) {
+                const style = document.createElement('style');
+                style.id = 'toast-animation';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(toast);
+
+            // 3초 후 자동 제거
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 3000);
+        }
+
+        // 페이지 로드 시 초기 코드 생성
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSignupCode();
+            updateLoginCode();
+            updateProfileCode();
+            updateProjectCreateCode();
+            updateProjectListCode();
+            updateLogoutCode();
+            
+            // 모든 input에 이벤트 리스너 추가
+            addEventListeners();
+        });
+
+        // 이벤트 리스너 추가
+        function addEventListeners() {
+            // 회원가입 필드들
+            document.getElementById('signup-name').addEventListener('input', updateSignupCode);
+            document.getElementById('signup-email').addEventListener('input', updateSignupCode);
+            document.getElementById('signup-phone').addEventListener('input', updateSignupCode);
+            document.getElementById('signup-password').addEventListener('input', updateSignupCode);
+            document.getElementById('signup-password-confirm').addEventListener('input', updateSignupCode);
+            
+            // 로그인 필드들
+            document.getElementById('login-email').addEventListener('input', updateLoginCode);
+            document.getElementById('login-password').addEventListener('input', updateLoginCode);
+            
+            // 프로젝트 생성 필드들
+            document.getElementById('project-name').addEventListener('input', updateProjectCreateCode);
+            document.getElementById('project-description').addEventListener('input', updateProjectCreateCode);
+        }
+
+        // 회원가입 코드 업데이트
+        function updateSignupCode() {
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const phone = document.getElementById('signup-phone').value;
+            const password = document.getElementById('signup-password').value;
+            
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/signup', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include',
+  body: JSON.stringify({
+    name: "${name}",
+    email: "${email}",
+    phone: "${phone}",
+    password: "${password}",
+    confirmPassword: "${password}"
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('signup-code').textContent = code;
+        }
+
+        // 로그인 코드 업데이트
+        function updateLoginCode() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include',
+  body: JSON.stringify({
+    email: "${email}",
+    password: "${password}"
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('login-code').textContent = code;
+        }
+
+        // 프로필 코드 업데이트
+        function updateProfileCode() {
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/user/profile', {
+  method: 'GET',
+  credentials: 'include'
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('profile-code').textContent = code;
+        }
+
+        // 프로젝트 생성 코드 업데이트
+        function updateProjectCreateCode() {
+            const name = document.getElementById('project-name').value;
+            const description = document.getElementById('project-description').value;
+            
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/project/new', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include',
+  body: JSON.stringify({
+    name: "${name}",
+    description: "${description}"
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('project-create-code').textContent = code;
+        }
+
+        // 프로젝트 목록 코드 업데이트
+        function updateProjectListCode() {
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/project/list', {
+  method: 'GET',
+  credentials: 'include'
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('project-list-code').textContent = code;
+        }
+
+        // 로그아웃 코드 업데이트
+        function updateLogoutCode() {
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/logout', {
+  method: 'GET',
+  credentials: 'include'
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('logout-code').textContent = code;
+        }
 
         // 탭 전환 함수
         function showTab(tabName) {
