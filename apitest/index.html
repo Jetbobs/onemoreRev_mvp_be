@@ -1277,6 +1277,7 @@ fetch(host + '/api/v1/logout', {
         // 리비전 서브밋 관련 함수들
         let projectsData = [];
         let selectedProject = null;
+        let trackFiles = {}; // 트랙별 파일 저장
 
         // 프로젝트 목록 로드
         async function loadProjects() {
@@ -1403,12 +1404,8 @@ fetch(host + '/api/v1/logout', {
             fileInfo.style.display = 'block';
             
             uploadBox.classList.add('has-file');
-            uploadBox.dataset.file = JSON.stringify({
-                name: file.name,
-                size: file.size,
-                lastModified: file.lastModified,
-                file: file
-            });
+            // 전역 변수에 파일 저장
+            trackFiles[trackId] = file;
         }
 
         // 파일 제거
@@ -1418,7 +1415,8 @@ fetch(host + '/api/v1/logout', {
             
             fileInfo.style.display = 'none';
             uploadBox.classList.remove('has-file');
-            delete uploadBox.dataset.file;
+            // 전역 변수에서 파일 제거
+            delete trackFiles[trackId];
         }
 
         // 리비전 서브밋
@@ -1437,14 +1435,16 @@ fetch(host + '/api/v1/logout', {
             const uploads = [];
             
             for (const uploadBox of uploadBoxes) {
-                const fileData = JSON.parse(uploadBox.dataset.file);
-                const file = fileData.file;
+                const trackId = parseInt(uploadBox.dataset.trackId);
+                const file = trackFiles[trackId];
+                
+                if (!file) continue;
                 
                 // 파일을 Base64로 변환
                 const base64 = await fileToBase64(file);
                 
                 uploads.push({
-                    trackId: parseInt(uploadBox.dataset.trackId),
+                    trackId: trackId,
                     file: {
                         original_filename: file.name,
                         size: file.size,
@@ -1500,13 +1500,14 @@ fetch(host + '/api/v1/logout', {
 
             const uploadBoxes = document.querySelectorAll('.track-upload-box.has-file');
             const uploads = Array.from(uploadBoxes).map(uploadBox => {
-                const fileData = JSON.parse(uploadBox.dataset.file);
+                const trackId = parseInt(uploadBox.dataset.trackId);
+                const file = trackFiles[trackId];
                 return {
-                    trackId: parseInt(uploadBox.dataset.trackId),
+                    trackId: trackId,
                     file: {
-                        original_filename: fileData.name,
-                        size: fileData.size,
-                        modified_datetime: new Date(fileData.lastModified).toISOString(),
+                        original_filename: file ? file.name : '파일명',
+                        size: file ? file.size : 0,
+                        modified_datetime: file ? new Date(file.lastModified).toISOString() : new Date().toISOString(),
                         data: '[Base64 데이터]'
                     }
                 };
