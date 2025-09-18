@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsArray, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsArray, IsDate, IsInt, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class FileDataDto {
   @ApiProperty({
@@ -21,6 +21,11 @@ export class FileDataDto {
     description: '파일 최종 수정일시',
     example: '2024-01-15T10:30:00.000Z'
   })
+  @Transform(({ value }) => {
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? value : date;
+  })
+  @IsDate({ message: '수정일시는 유효한 날짜여야 합니다.' })
   modified_datetime: Date;
 
   @ApiProperty({

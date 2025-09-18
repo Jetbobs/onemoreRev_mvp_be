@@ -14,10 +14,16 @@ import { ProjectsModule } from './projects/projects.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'apitest'),
-      serveRoot: '/apitest',
-    }),
+    ServeStaticModule.forRoot([
+      {
+        rootPath: join(__dirname, '..', 'apitest'),
+        serveRoot: '/apitest',
+      },
+      {
+        rootPath: join(__dirname, '..', 'files'),
+        serveRoot: '/files',
+      },
+    ]),
     PrismaModule,
     AuthModule,
     ProjectsModule,

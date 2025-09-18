@@ -1104,6 +1104,11 @@ fetch(host + '/api/v1/logout', {
             
             // 해당 탭 콘텐츠에 active 클래스 추가
             document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // 리비전 제출 탭이 활성화될 때 프로젝트 목록 갱신
+            if (tabName === 'revision-submit') {
+                loadProjects();
+            }
         }
 
         function showResponse(elementId, data, isError = false) {
@@ -1290,9 +1295,16 @@ fetch(host + '/api/v1/logout', {
                 if (result.success) {
                     projectsData = result.projects;
                     populateProjectSelect();
+                } else {
+                    // 로그아웃 상태이거나 권한이 없는 경우 목록 비우기
+                    projectsData = [];
+                    populateProjectSelect();
                 }
             } catch (error) {
                 console.error('프로젝트 목록 로드 실패:', error);
+                // 네트워크 오류나 기타 오류 시에도 목록 비우기
+                projectsData = [];
+                populateProjectSelect();
             }
         }
 
