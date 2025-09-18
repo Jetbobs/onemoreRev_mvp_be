@@ -58,6 +58,7 @@ model Revision {
   // 관계
   project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdTracks Track[] @relation("TrackCreatedRevision")
+  files        File[]
 
   // 인덱스
   @@index([projectId])
@@ -78,6 +79,7 @@ model Track {
   // 관계
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdRev  Revision @relation("TrackCreatedRevision", fields: [createdRevId], references: [id], onDelete: Cascade)
+  files       File[]
 
   // 인덱스
   @@index([projectId])
@@ -122,4 +124,29 @@ model Invitation {
   @@index([guestId])
   @@unique([projectId, guestId]) // 같은 프로젝트에 같은 게스트는 한 번만 초대 가능
   @@map("invitations")
+}
+
+// File 모델
+model File {
+  id               Int      @id @default(autoincrement())
+  revisionId       Int      // 리비전 ID (외래키)
+  trackId           Int      // 트랙 ID (외래키)
+  originalFilename  String   @db.VarChar(255) // 원본 파일명
+  storedFilename    String   @db.VarChar(255) // 저장된 파일명 (UUID 등)
+  filePath          String   @db.VarChar(500) // 파일 저장 경로
+  fileSize          BigInt   // 파일 크기 (바이트)
+  mimeType          String   @db.VarChar(100) // MIME 타입
+  modifiedDatetime  DateTime // 파일 최종 수정일시
+  uploadedAt        DateTime @default(now()) // 업로드 일시
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // 관계
+  revision Revision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  track    Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  // 인덱스
+  @@index([revisionId])
+  @@index([trackId])
+  @@map("files")
 }
