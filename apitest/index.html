@@ -870,6 +870,9 @@
             updateProjectInfoCode();
             updateLogoutCode();
             
+            // 프로젝트 목록 로드
+            loadProjects();
+            
             // 모든 input에 이벤트 리스너 추가
             addEventListeners();
         });
@@ -902,6 +905,9 @@
 
             // 프로젝트 조회 필드들
             document.getElementById('project-info-id').addEventListener('input', updateProjectInfoCode);
+
+            // 리비전 서브밋 필드들
+            document.getElementById('revision-description').addEventListener('input', updateRevisionSubmitCode);
         }
 
         // 게스트 관리 함수들
@@ -1266,6 +1272,266 @@ fetch(host + '/api/v1/logout', {
                 showResponse('logout-response', { error: error.message }, true);
                 showStatusCode('logout-status', 0); // 네트워크 오류
             }
+        }
+
+        // 리비전 서브밋 관련 함수들
+        let projectsData = [];
+        let selectedProject = null;
+
+        // 프로젝트 목록 로드
+        async function loadProjects() {
+            try {
+                const response = await fetch(`${API_BASE}/project/list`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                if (result.success) {
+                    projectsData = result.projects;
+                    populateProjectSelect();
+                }
+            } catch (error) {
+                console.error('프로젝트 목록 로드 실패:', error);
+            }
+        }
+
+        // 프로젝트 select 박스 채우기
+        function populateProjectSelect() {
+            const select = document.getElementById('revision-submit-project');
+            select.innerHTML = '<option value="">프로젝트를 선택해주세요</option>';
+            
+            projectsData.forEach(project => {
+                const option = document.createElement('option');
+                option.value = project.id;
+                option.textContent = `${project.name} (ID: ${project.id})`;
+                select.appendChild(option);
+            });
+        }
+
+        // 프로젝트 선택 시 호출
+        async function onProjectSelect() {
+            const projectId = document.getElementById('revision-submit-project').value;
+            if (!projectId) {
+                document.getElementById('revision-info').style.display = 'none';
+                document.getElementById('tracks-container').style.display = 'none';
+                return;
+            }
+
+            selectedProject = projectsData.find(p => p.id == projectId);
+            if (!selectedProject) return;
+
+            // 마지막 리비전 ID 표시
+            if (selectedProject.lastRevision) {
+                document.getElementById('last-revision-id').textContent = selectedProject.lastRevision.id;
+                document.getElementById('revision-info').style.display = 'block';
+            }
+
+            // 트랙별 업로드 박스 생성
+            createTrackUploadBoxes(selectedProject.tracks);
+            document.getElementById('tracks-container').style.display = 'block';
+        }
+
+        // 트랙별 업로드 박스 생성
+        function createTrackUploadBoxes(tracks) {
+            const container = document.getElementById('track-upload-boxes');
+            container.innerHTML = '';
+
+            tracks.forEach(track => {
+                const uploadBox = document.createElement('div');
+                uploadBox.className = 'track-upload-box';
+                uploadBox.dataset.trackId = track.id;
+                uploadBox.innerHTML = `
+                    <div class="track-name">${track.name}</div>
+                    <div class="upload-text">파일을 드래그하거나 클릭하여 업로드</div>
+                    <div class="file-info" style="display: none;"></div>
+                `;
+
+                // 드래그앤드롭 이벤트 추가
+                uploadBox.addEventListener('dragover', handleDragOver);
+                uploadBox.addEventListener('dragleave', handleDragLeave);
+                uploadBox.addEventListener('drop', (e) => handleDrop(e, track.id));
+                uploadBox.addEventListener('click', () => handleClick(track.id));
+
+                container.appendChild(uploadBox);
+            });
+        }
+
+        // 드래그오버 처리
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        // 드래그리브 처리
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        // 드롭 처리
+        function handleDrop(e, trackId) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0], trackId);
+            }
+        }
+
+        // 클릭 처리
+        function handleClick(trackId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.onchange = (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0], trackId);
+                }
+            };
+            input.click();
+        }
+
+        // 파일 선택 처리
+        function handleFileSelect(file, trackId) {
+            const uploadBox = document.querySelector(`[data-track-id="${trackId}"]`);
+            const fileInfo = uploadBox.querySelector('.file-info');
+            
+            // 파일 정보 표시
+            fileInfo.innerHTML = `
+                <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)
+                <button class="remove-file" onclick="removeFile(${trackId})">제거</button>
+            `;
+            fileInfo.style.display = 'block';
+            
+            uploadBox.classList.add('has-file');
+            uploadBox.dataset.file = JSON.stringify({
+                name: file.name,
+                size: file.size,
+                lastModified: file.lastModified,
+                file: file
+            });
+        }
+
+        // 파일 제거
+        function removeFile(trackId) {
+            const uploadBox = document.querySelector(`[data-track-id="${trackId}"]`);
+            const fileInfo = uploadBox.querySelector('.file-info');
+            
+            fileInfo.style.display = 'none';
+            uploadBox.classList.remove('has-file');
+            delete uploadBox.dataset.file;
+        }
+
+        // 리비전 서브밋
+        async function submitRevision() {
+            if (!selectedProject || !selectedProject.lastRevision) {
+                alert('프로젝트와 리비전을 선택해주세요.');
+                return;
+            }
+
+            const uploadBoxes = document.querySelectorAll('.track-upload-box.has-file');
+            if (uploadBoxes.length === 0) {
+                alert('최소 하나의 파일을 업로드해주세요.');
+                return;
+            }
+
+            const uploads = [];
+            
+            for (const uploadBox of uploadBoxes) {
+                const fileData = JSON.parse(uploadBox.dataset.file);
+                const file = fileData.file;
+                
+                // 파일을 Base64로 변환
+                const base64 = await fileToBase64(file);
+                
+                uploads.push({
+                    trackId: parseInt(uploadBox.dataset.trackId),
+                    file: {
+                        original_filename: file.name,
+                        size: file.size,
+                        modified_datetime: new Date(file.lastModified).toISOString(),
+                        data: base64
+                    }
+                });
+            }
+
+            const submitData = {
+                revisionId: selectedProject.lastRevision.id,
+                description: document.getElementById('revision-description').value || undefined,
+                uploads: uploads
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/revision/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(submitData),
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                showResponse('revision-submit-response', result, !response.ok);
+                showStatusCode('revision-submit-status', response.status);
+            } catch (error) {
+                showResponse('revision-submit-response', { error: error.message }, true);
+                showStatusCode('revision-submit-status', 0);
+            }
+        }
+
+        // 파일을 Base64로 변환
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1]; // data:image/jpeg;base64, 부분 제거
+                    resolve(base64);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // 리비전 서브밋 코드 업데이트
+        function updateRevisionSubmitCode() {
+            if (!selectedProject || !selectedProject.lastRevision) {
+                document.getElementById('revision-submit-code').textContent = '프로젝트를 먼저 선택해주세요.';
+                return;
+            }
+
+            const uploadBoxes = document.querySelectorAll('.track-upload-box.has-file');
+            const uploads = Array.from(uploadBoxes).map(uploadBox => {
+                const fileData = JSON.parse(uploadBox.dataset.file);
+                return {
+                    trackId: parseInt(uploadBox.dataset.trackId),
+                    file: {
+                        original_filename: fileData.name,
+                        size: fileData.size,
+                        modified_datetime: new Date(fileData.lastModified).toISOString(),
+                        data: '[Base64 데이터]'
+                    }
+                };
+            });
+
+            const code = `const host = '${HOST}';
+const data = {
+  revisionId: ${selectedProject.lastRevision.id},
+  description: "${document.getElementById('revision-description').value || ''}",
+  uploads: ${JSON.stringify(uploads, null, 2)}
+};
+
+fetch(host + '/api/v1/revision/submit', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+  credentials: 'include'
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+
+            document.getElementById('revision-submit-code').textContent = code;
         }
     </script>
 </body>
