@@ -287,6 +287,47 @@
             background-color: #004085;
         }
         
+        /* 게스트 입력 스타일 */
+        .guest-item {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+            align-items: center;
+        }
+        
+        .guest-item input {
+            width: 30%;
+        }
+        
+        .guest-item button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 8px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .guest-item button:hover {
+            background-color: #c82333;
+        }
+        
+        #guests-container button[onclick="addGuest()"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        
+        #guests-container button[onclick="addGuest()"]:hover {
+            background-color: #218838;
+        }
+        
         /* 탭 스타일 */
         .tab-container {
             margin-bottom: 20px;
@@ -465,6 +506,18 @@
 - UI/UX 디자인
 - 브랜딩 및 아이덴티티
 - 그래픽 디자인 작업</textarea>
+                </div>
+                <div class="form-group">
+                    <label>게스트 초대 (선택사항):</label>
+                    <div id="guests-container">
+                        <div class="guest-item">
+                            <input type="text" placeholder="게스트 이름" class="guest-name">
+                            <input type="email" placeholder="게스트 이메일" class="guest-email">
+                            <input type="text" placeholder="게스트 전화번호" class="guest-phone">
+                            <button type="button" onclick="removeGuest(this)">삭제</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addGuest()">게스트 추가</button>
                 </div>
                 <div class="code-response-container">
                     <div class="code-section">
@@ -691,6 +744,52 @@
             // 프로젝트 생성 필드들
             document.getElementById('project-name').addEventListener('input', updateProjectCreateCode);
             document.getElementById('project-description').addEventListener('input', updateProjectCreateCode);
+            
+            // 게스트 필드들에 이벤트 리스너 추가
+            document.addEventListener('input', function(e) {
+                if (e.target.classList.contains('guest-name') || 
+                    e.target.classList.contains('guest-email') || 
+                    e.target.classList.contains('guest-phone')) {
+                    updateProjectCreateCode();
+                }
+            });
+        }
+
+        // 게스트 관리 함수들
+        function addGuest() {
+            const container = document.getElementById('guests-container');
+            const guestItem = document.createElement('div');
+            guestItem.className = 'guest-item';
+            guestItem.innerHTML = `
+                <input type="text" placeholder="게스트 이름" class="guest-name">
+                <input type="email" placeholder="게스트 이메일" class="guest-email">
+                <input type="text" placeholder="게스트 전화번호" class="guest-phone">
+                <button type="button" onclick="removeGuest(this)">삭제</button>
+            `;
+            container.appendChild(guestItem);
+            updateProjectCreateCode();
+        }
+
+        function removeGuest(button) {
+            button.parentElement.remove();
+            updateProjectCreateCode();
+        }
+
+        function getGuestsData() {
+            const guests = [];
+            const guestItems = document.querySelectorAll('.guest-item');
+            
+            guestItems.forEach(item => {
+                const name = item.querySelector('.guest-name').value.trim();
+                const email = item.querySelector('.guest-email').value.trim();
+                const phone = item.querySelector('.guest-phone').value.trim();
+                
+                if (name && email && phone) {
+                    guests.push({ name, email, phone });
+                }
+            });
+            
+            return guests;
         }
 
         // 회원가입 코드 업데이트
@@ -764,6 +863,12 @@ fetch(host + '/api/v1/user/profile', {
         function updateProjectCreateCode() {
             const name = document.getElementById('project-name').value;
             const description = document.getElementById('project-description').value;
+            const guests = getGuestsData();
+            
+            let guestsString = '';
+            if (guests.length > 0) {
+                guestsString = ',\n    guests: ' + JSON.stringify(guests, null, 4).replace(/\n/g, '\n    ');
+            }
             
             const code = `const host = '${HOST}';
 fetch(host + '/api/v1/project/new', {
@@ -774,7 +879,7 @@ fetch(host + '/api/v1/project/new', {
   credentials: 'include',
   body: JSON.stringify({
     name: "${name}",
-    description: "${description}"
+    description: "${description}"${guestsString}
   })
 })
 .then(response => response.json())
@@ -926,7 +1031,8 @@ fetch(host + '/api/v1/logout', {
         async function createProject() {
             const data = {
                 name: document.getElementById('project-name').value,
-                description: document.getElementById('project-description').value
+                description: document.getElementById('project-description').value,
+                guests: getGuestsData()
             };
 
             try {
