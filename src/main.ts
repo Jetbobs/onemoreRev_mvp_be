@@ -6,6 +6,11 @@ import * as session from 'express-session';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  // BigInt 직렬화 처리
+  (BigInt.prototype as any).toJSON = function() {
+    return this.toString();
+  };
+
   const app = await NestFactory.create(AppModule);
 
   // Body parser 설정 (50MB 제한)

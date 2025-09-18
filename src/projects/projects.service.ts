@@ -3,12 +3,16 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { PrismaService } from '../prisma/prisma.service';
+import { AddTrackResponseDto } from './dto/add-track-response.dto';
+import { AddTrackDto } from './dto/add-track.dto';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { CreateRevisionDto } from './dto/create-revision.dto';
 import { GetProjectInfoDto } from './dto/get-project-info.dto';
+import { GetRevisionInfoDto } from './dto/get-revision-info.dto';
 import { ProjectInfoResponseDto } from './dto/project-info-response.dto';
 import { LastRevisionDto, ProjectListItemDto, ProjectListResponseDto } from './dto/project-list-response.dto';
 import { ProjectResponseDto } from './dto/project-response.dto';
+import { RevisionInfoResponseDto, RevisionTrackDto } from './dto/revision-info-response.dto';
 import { RevisionResponseDto } from './dto/revision-response.dto';
 import { FileInfoDto, SubmitRevisionResponseDto } from './dto/submit-revision-response.dto';
 import { SubmitRevisionDto } from './dto/submit-revision.dto';
@@ -234,6 +238,26 @@ export class ProjectsService {
             createdRevId: true,
             createdAt: true,
             updatedAt: true,
+            files: {
+              select: {
+                id: true,
+                originalFilename: true,
+                storedFilename: true,
+                fileSize: true,
+                mimeType: true,
+                uploadedAt: true,
+                revisionId: true,
+                revision: {
+                  select: {
+                    revNo: true,
+                  },
+                },
+              },
+              orderBy: {
+                revisionId: 'desc', // 최신 리비전의 파일이 먼저
+              },
+              take: 1, // 각 트랙당 최신 파일 1개만
+            },
           },
           orderBy: {
             createdAt: 'asc', // 트랙 생성 순서대로 정렬
@@ -281,7 +305,23 @@ export class ProjectsService {
         updatedAt: project.updatedAt,
         revisionCount: project._count.revisions,
         lastRevision,
-        tracks: project.tracks, // 프로젝트에 귀속된 모든 트랙들
+        tracks: project.tracks.map(track => ({
+          id: track.id,
+          name: track.name,
+          createdRevNo: track.createdRevNo,
+          createdRevId: track.createdRevId,
+          createdAt: track.createdAt,
+          updatedAt: track.updatedAt,
+          latestFile: track.files.length > 0 ? {
+            id: track.files[0].id,
+            originalFilename: track.files[0].originalFilename,
+            storedFilename: track.files[0].storedFilename,
+            fileSize: Number(track.files[0].fileSize),
+            mimeType: track.files[0].mimeType,
+            uploadedAt: track.files[0].uploadedAt,
+            revNo: track.files[0].revision.revNo,
+          } : undefined,
+        })), // 프로젝트에 귀속된 모든 트랙들 (최신 파일 정보 포함)
         guests: project.invitations.map(invitation => invitation.guest), // 프로젝트에 초대된 모든 게스트들
       };
     });
@@ -505,6 +545,26 @@ export class ProjectsService {
             createdRevId: true,
             createdAt: true,
             updatedAt: true,
+            files: {
+              select: {
+                id: true,
+                originalFilename: true,
+                storedFilename: true,
+                fileSize: true,
+                mimeType: true,
+                uploadedAt: true,
+                revisionId: true,
+                revision: {
+                  select: {
+                    revNo: true,
+                  },
+                },
+              },
+              orderBy: {
+                revisionId: 'desc', // 최신 리비전의 파일이 먼저
+              },
+              take: 1, // 각 트랙당 최신 파일 1개만
+            },
           },
           orderBy: {
             createdAt: 'asc', // 트랙 생성 순서대로 정렬
@@ -548,8 +608,193 @@ export class ProjectsService {
       createdAt: project.createdAt,
       updatedAt: project.updatedAt,
       revisions: project.revisions,
-      tracks: project.tracks,
+      tracks: project.tracks.map(track => ({
+        id: track.id,
+        name: track.name,
+        createdRevNo: track.createdRevNo,
+        createdRevId: track.createdRevId,
+        createdAt: track.createdAt,
+        updatedAt: track.updatedAt,
+        latestFile: track.files.length > 0 ? {
+          id: track.files[0].id,
+          originalFilename: track.files[0].originalFilename,
+          storedFilename: track.files[0].storedFilename,
+          fileSize: Number(track.files[0].fileSize),
+          mimeType: track.files[0].mimeType,
+          uploadedAt: track.files[0].uploadedAt,
+          revNo: track.files[0].revision.revNo,
+        } : undefined,
+      })),
       guests: project.invitations.map(invitation => invitation.guest),
+    };
+  }
+
+  async addTrack(addTrackDto: AddTrackDto, userId: number): Promise<AddTrackResponseDto> {
+    // 프로젝트 존재 여부 및 소유자 확인
+    const project = await this.prisma.project.findUnique({
+      where: { id: addTrackDto.projectId },
+      select: {
+        id: true,
+        name: true,
+        authorId: true,
+        revisions: {
+          select: {
+            id: true,
+            revNo: true,
+          },
+          orderBy: {
+            revNo: 'desc',
+          },
+          take: 1,
+        },
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundException('프로젝트를 찾을 수 없습니다.');
+    }
+
+    if (project.authorId !== userId) {
+      throw new ForbiddenException('해당 프로젝트에 트랙을 추가할 권한이 없습니다.');
+    }
+
+    // 최신 리비전이 있는지 확인
+    if (project.revisions.length === 0) {
+      throw new BadRequestException('프로젝트에 리비전이 없습니다. 먼저 리비전을 생성해주세요.');
+    }
+
+    const latestRevision = project.revisions[0];
+
+    // 트랙 생성
+    const track = await this.prisma.track.create({
+      data: {
+        name: addTrackDto.name,
+        projectId: addTrackDto.projectId,
+        createdRevNo: latestRevision.revNo,
+        createdRevId: latestRevision.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        projectId: true,
+        createdRevNo: true,
+        createdRevId: true,
+        createdAt: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: '트랙이 성공적으로 추가되었습니다.',
+      trackId: track.id,
+      name: track.name,
+      projectId: track.projectId,
+      createdRevNo: track.createdRevNo,
+      createdRevId: track.createdRevId,
+      createdAt: track.createdAt,
+    };
+  }
+
+  async getRevisionInfo(getRevisionInfoDto: GetRevisionInfoDto, userId: number): Promise<RevisionInfoResponseDto> {
+    // 리비전 존재 여부 및 권한 확인
+    const revision = await this.prisma.revision.findUnique({
+      where: { id: getRevisionInfoDto.revisionId },
+      include: {
+        project: {
+          select: {
+            id: true,
+            name: true,
+            authorId: true,
+            tracks: {
+              select: {
+                id: true,
+                name: true,
+                createdRevNo: true,
+                createdRevId: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+              orderBy: {
+                createdAt: 'asc',
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!revision) {
+      throw new NotFoundException('리비전을 찾을 수 없습니다.');
+    }
+
+    if (revision.project.authorId !== userId) {
+      throw new ForbiddenException('해당 리비전에 대한 권한이 없습니다.');
+    }
+
+    // 각 트랙별로 요청한 리비전 또는 그 이전 리비전의 최신 파일 조회
+    const tracksWithFiles: RevisionTrackDto[] = [];
+    
+    for (const track of revision.project.tracks) {
+      // 해당 트랙에서 요청한 리비전 번호 이하의 최신 파일 조회
+      const latestFile = await this.prisma.file.findFirst({
+        where: {
+          trackId: track.id,
+          revision: {
+            revNo: {
+              lte: revision.revNo, // 요청한 리비전 번호 이하
+            },
+          },
+        },
+        select: {
+          id: true,
+          originalFilename: true,
+          storedFilename: true,
+          fileSize: true,
+          mimeType: true,
+          uploadedAt: true,
+        },
+        orderBy: [
+          {
+            revision: {
+              revNo: 'desc', // 리비전 번호 내림차순
+            },
+          },
+          {
+            uploadedAt: 'desc', // 같은 리비전 내에서는 업로드 시간 내림차순
+          },
+        ],
+      });
+
+      tracksWithFiles.push({
+        id: track.id,
+        name: track.name,
+        createdRevNo: track.createdRevNo,
+        createdRevId: track.createdRevId,
+        createdAt: track.createdAt,
+        updatedAt: track.updatedAt,
+        latestFile: latestFile ? {
+          id: latestFile.id,
+          originalFilename: latestFile.originalFilename,
+          storedFilename: latestFile.storedFilename,
+          fileSize: Number(latestFile.fileSize),
+          mimeType: latestFile.mimeType,
+          uploadedAt: latestFile.uploadedAt,
+        } : undefined,
+      });
+    }
+
+    return {
+      success: true,
+      message: '리비전 정보를 성공적으로 조회했습니다.',
+      id: revision.id,
+      revNo: revision.revNo,
+      description: revision.description,
+      status: revision.status,
+      projectId: revision.project.id,
+      projectName: revision.project.name,
+      createdAt: revision.createdAt,
+      updatedAt: revision.updatedAt,
+      tracks: tracksWithFiles,
     };
   }
 }

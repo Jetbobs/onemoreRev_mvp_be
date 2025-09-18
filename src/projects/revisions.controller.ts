@@ -1,7 +1,9 @@
 import {
     Body,
     Controller,
+    Get,
     Post,
+    Query,
     Req,
     UnauthorizedException,
     UsePipes,
@@ -10,10 +12,13 @@ import {
 import {
     ApiBody,
     ApiOperation,
+    ApiQuery,
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
+import { GetRevisionInfoDto } from './dto/get-revision-info.dto';
+import { RevisionInfoResponseDto } from './dto/revision-info-response.dto';
 import { SubmitRevisionResponseDto } from './dto/submit-revision-response.dto';
 import { SubmitRevisionDto } from './dto/submit-revision.dto';
 import { ProjectsService } from './projects.service';
@@ -64,5 +69,50 @@ export class RevisionsController {
     }
 
     return this.projectsService.submitRevision(submitRevisionDto, req.session.userId);
+  }
+
+  @Get('info')
+  @ApiOperation({
+    summary: '리비전 상세 정보 조회',
+    description: '특정 리비전의 상세 정보를 조회합니다. 프로젝트 소유자만 조회할 수 있으며, 각 트랙별로 해당 리비전 또는 그 이전 리비전의 최신 파일 정보를 반환합니다.'
+  })
+  @ApiQuery({
+    name: 'revisionId',
+    description: '조회할 리비전 ID',
+    type: 'number',
+    example: 1
+  })
+  @ApiResponse({
+    status: 200,
+    description: '리비전 정보를 성공적으로 조회했습니다.',
+    type: RevisionInfoResponseDto
+  })
+  @ApiResponse({
+    status: 400,
+    description: '잘못된 요청 데이터입니다.'
+  })
+  @ApiResponse({
+    status: 401,
+    description: '로그인이 필요합니다.'
+  })
+  @ApiResponse({
+    status: 403,
+    description: '해당 리비전에 대한 권한이 없습니다.'
+  })
+  @ApiResponse({
+    status: 404,
+    description: '리비전을 찾을 수 없습니다.'
+  })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getRevisionInfo(
+    @Query() getRevisionInfoDto: GetRevisionInfoDto,
+    @Req() req: Request
+  ): Promise<RevisionInfoResponseDto> {
+    // 세션에서 사용자 ID 확인
+    if (!req.session.userId) {
+      throw new UnauthorizedException('로그인이 필요합니다.');
+    }
+
+    return this.projectsService.getRevisionInfo(getRevisionInfoDto, req.session.userId);
   }
 }

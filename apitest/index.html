@@ -387,9 +387,81 @@
             transform: scale(1.02);
         }
 
-        .track-upload-box.has-file {
+        .track-thumbnail.has-file {
             border-color: #28a745;
             background-color: #f0fff4;
+        }
+
+        /* 트랙 썸네일 스타일 */
+        .tracks-thumbnail-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .track-thumbnail {
+            width: 150px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 3px;
+            text-align: center;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .track-thumbnail:hover {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+
+        /* has-file 클래스는 파일 검증용으로만 사용, 스타일은 적용하지 않음 */
+
+        .track-thumbnail.new-file {
+            border-color: #FF9800;
+            background-color: #fff8f0;
+        }
+
+        .track-thumbnail-title {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .track-thumbnail-image {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .track-thumbnail-file-info {
+            font-size: 7px;
+            color: #666;
+            line-height: 1.2;
+        }
+
+        .track-thumbnail-file-info div {
+            margin-bottom: 2px;
+        }
+
+        .track-thumbnail-placeholder {
+            width: 120px;
+            height: 80px;
+            background-color: #f0f0f0;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 11px;
+            margin: 0 auto 5px auto;
         }
 
         .track-name {
@@ -443,6 +515,8 @@
                 <button class="tab-button" onclick="showTab('project-create')">📁 프로젝트생성</button>
                 <button class="tab-button" onclick="showTab('project-list')">📋 프로젝트목록</button>
                 <button class="tab-button" onclick="showTab('project-info')">📄 프로젝트조회</button>
+                <button class="tab-button" onclick="showTab('track-add')">🎵 트랙추가</button>
+                <button class="tab-button" onclick="showTab('revision-info')">📋 리비전조회</button>
                 <button class="tab-button" onclick="showTab('revision-submit')">📤 리비전제출</button>
             </div>
         </div>
@@ -659,6 +733,68 @@
             </div>
         </div>
 
+        <!-- 트랙 추가 탭 -->
+        <div id="track-add-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/v1/track/add</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/track/add')">복사</button>
+                </div>
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('track-add-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="track-add-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <div class="response" id="track-add-response" style="display: none;"></div>
+                        <div id="track-add-status" class="status-code" style="display: none;"></div>
+                    </div>
+                </div>
+                
+                <label for="track-add-project-id">프로젝트 ID:</label>
+                <input type="number" id="track-add-project-id" placeholder="프로젝트 ID를 입력해주세요" value="1">
+                
+                <label for="track-add-name">트랙 이름:</label>
+                <input type="text" id="track-add-name" placeholder="트랙 이름을 입력해주세요" value="로고 디자인">
+                
+                <button class="submit-button" onclick="addTrack()">Run</button>
+            </div>
+        </div>
+
+        <!-- 리비전 조회 탭 -->
+        <div id="revision-info-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method get">GET</span>
+                    <span>/api/v1/revision/info</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/revision/info')">복사</button>
+                </div>
+                
+                <label for="revision-info-id">리비전 ID:</label>
+                <input type="number" id="revision-info-id" placeholder="리비전 ID를 입력해주세요" value="1">
+                
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('revision-info-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="revision-info-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <div class="response" id="revision-info-response" style="display: none;"></div>
+                        <div id="revision-info-status" class="status-code" style="display: none;"></div>
+                    </div>
+                </div>
+                
+                <button class="submit-button" onclick="getRevisionInfo()">Run</button>
+            </div>
+        </div>
+
         <!-- 리비전 서브밋 탭 -->
         <div id="revision-submit-tab" class="tab-content">
             <div class="api-section">
@@ -676,13 +812,17 @@
                 </div>
 
                 <div id="revision-info" class="form-group" style="display: none;">
-                    <label>마지막 리비전 ID:</label>
-                    <span id="last-revision-id" style="font-weight: bold; color: #007bff;"></span>
+                    <div style="margin-bottom: 5px;">
+                        <label>리비전 No: <span id="last-revision-no" style="font-weight: bold; color: #007bff;"></span></label>
+                    </div>
+                    <div>
+                        <label>리비전 ID: <span id="last-revision-id" style="font-weight: bold; color: #007bff;"></span></label>
+                    </div>
                 </div>
 
                 <div id="tracks-container" style="display: none;">
                     <label>트랙별 파일 업로드:</label>
-                    <div id="track-upload-boxes"></div>
+                    <div class="tracks-thumbnail-container" id="track-thumbnails"></div>
                 </div>
 
                 <div class="form-group">
@@ -868,6 +1008,8 @@
             updateProjectCreateCode();
             updateProjectListCode();
             updateProjectInfoCode();
+            updateTrackAddCode();
+            updateRevisionInfoCode();
             updateLogoutCode();
             
             // 프로젝트 목록 로드
@@ -905,6 +1047,13 @@
 
             // 프로젝트 조회 필드들
             document.getElementById('project-info-id').addEventListener('input', updateProjectInfoCode);
+
+            // 트랙 추가 필드들
+            document.getElementById('track-add-project-id').addEventListener('input', updateTrackAddCode);
+            document.getElementById('track-add-name').addEventListener('input', updateTrackAddCode);
+
+            // 리비전 조회 필드들
+            document.getElementById('revision-info-id').addEventListener('input', updateRevisionInfoCode);
 
             // 리비전 서브밋 필드들
             document.getElementById('revision-description').addEventListener('input', updateRevisionSubmitCode);
@@ -1071,6 +1220,44 @@ fetch(host + '/api/v1/project/info?projectId=${projectId}', {
 .catch(error => console.error('Error:', error));`;
             
             document.getElementById('project-info-code').textContent = code;
+        }
+
+        // 트랙 추가 코드 업데이트
+        function updateTrackAddCode() {
+            const projectId = document.getElementById('track-add-project-id').value || '1';
+            const name = document.getElementById('track-add-name').value || '로고 디자인';
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/track/add', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include',
+  body: JSON.stringify({
+    projectId: ${projectId},
+    name: "${name}"
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('track-add-code').textContent = code;
+        }
+
+        // 리비전 조회 코드 업데이트
+        function updateRevisionInfoCode() {
+            const revisionId = document.getElementById('revision-info-id').value || '1';
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/revision/info?revisionId=${revisionId}', {
+  method: 'GET',
+  credentials: 'include'
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('revision-info-code').textContent = code;
         }
 
         // 로그아웃 코드 업데이트
@@ -1264,6 +1451,63 @@ fetch(host + '/api/v1/logout', {
             }
         }
 
+        async function addTrack() {
+            const projectId = document.getElementById('track-add-project-id').value;
+            const name = document.getElementById('track-add-name').value;
+            
+            if (!projectId) {
+                alert('프로젝트 ID를 입력해주세요.');
+                return;
+            }
+            
+            if (!name) {
+                alert('트랙 이름을 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/track/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        projectId: parseInt(projectId),
+                        name: name
+                    })
+                });
+                const result = await response.json();
+                showResponse('track-add-response', result, !response.ok);
+                showStatusCode('track-add-status', response.status);
+            } catch (error) {
+                showResponse('track-add-response', { error: error.message }, true);
+                showStatusCode('track-add-status', 0); // 네트워크 오류
+            }
+        }
+
+        async function getRevisionInfo() {
+            const revisionId = document.getElementById('revision-info-id').value;
+            
+            if (!revisionId) {
+                alert('리비전 ID를 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/revision/info?revisionId=${revisionId}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                showResponse('revision-info-response', result, !response.ok);
+                showStatusCode('revision-info-status', response.status);
+            } catch (error) {
+                showResponse('revision-info-response', { error: error.message }, true);
+                showStatusCode('revision-info-status', 0); // 네트워크 오류
+            }
+        }
+
         async function logout() {
             try {
                 const response = await fetch(`${API_BASE}/logout`, {
@@ -1333,8 +1577,9 @@ fetch(host + '/api/v1/logout', {
             selectedProject = projectsData.find(p => p.id == projectId);
             if (!selectedProject) return;
 
-            // 마지막 리비전 ID 표시
+            // 마지막 리비전 정보 표시
             if (selectedProject.lastRevision) {
+                document.getElementById('last-revision-no').textContent = selectedProject.lastRevision.revNo;
                 document.getElementById('last-revision-id').textContent = selectedProject.lastRevision.id;
                 document.getElementById('revision-info').style.display = 'block';
             }
@@ -1344,28 +1589,53 @@ fetch(host + '/api/v1/logout', {
             document.getElementById('tracks-container').style.display = 'block';
         }
 
-        // 트랙별 업로드 박스 생성
+        // 트랙별 썸네일 생성
         function createTrackUploadBoxes(tracks) {
-            const container = document.getElementById('track-upload-boxes');
+            const container = document.getElementById('track-thumbnails');
             container.innerHTML = '';
 
             tracks.forEach(track => {
-                const uploadBox = document.createElement('div');
-                uploadBox.className = 'track-upload-box';
-                uploadBox.dataset.trackId = track.id;
-                uploadBox.innerHTML = `
-                    <div class="track-name">${track.name}</div>
-                    <div class="upload-text">파일을 드래그하거나 클릭하여 업로드</div>
-                    <div class="file-info" style="display: none;"></div>
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'track-thumbnail';
+                thumbnail.dataset.trackId = track.id;
+                thumbnail.dataset.trackName = track.name;
+                
+                // 최신 파일 정보 표시
+                const latestFile = track.latestFile;
+                const hasFile = latestFile && latestFile.originalFilename;
+                
+                // 원래 파일 정보를 DOM 요소에 저장
+                if (hasFile) {
+                    thumbnail.dataset.originalFile = JSON.stringify(latestFile);
+                }
+                
+                thumbnail.innerHTML = `
+                    <div class="track-thumbnail-title">${track.name}</div>
+                    ${hasFile ? `
+                        <img src="/files/${latestFile.storedFilename}" class="track-thumbnail-image" alt="${latestFile.originalFilename}">
+                        <div class="track-thumbnail-file-info">
+                            <div style="font-weight: bold; color: #333;">${latestFile.originalFilename}</div>
+                            <div>저장: ${new Date(latestFile.uploadedAt).toLocaleDateString()}</div>
+                            <div>업로드: ${new Date(latestFile.uploadedAt).toLocaleTimeString()}</div>
+                            <div>리비전: ${latestFile.revNo || 'N'}</div>
+                        </div>
+                    ` : `
+                        <div class="track-thumbnail-placeholder">파일 없음</div>
+                        <div class="track-thumbnail-file-info">
+                            <div>클릭하여 파일 업로드</div>
+                        </div>
+                    `}
                 `;
+                
+                // 기존 파일이 있어도 기본 스타일 유지 (has-file 클래스 추가하지 않음)
 
                 // 드래그앤드롭 이벤트 추가
-                uploadBox.addEventListener('dragover', handleDragOver);
-                uploadBox.addEventListener('dragleave', handleDragLeave);
-                uploadBox.addEventListener('drop', (e) => handleDrop(e, track.id));
-                uploadBox.addEventListener('click', () => handleClick(track.id));
+                thumbnail.addEventListener('dragover', handleDragOver);
+                thumbnail.addEventListener('dragleave', handleDragLeave);
+                thumbnail.addEventListener('drop', (e) => handleDrop(e, track.id));
+                thumbnail.addEventListener('click', () => handleClick(track.id));
 
-                container.appendChild(uploadBox);
+                container.appendChild(thumbnail);
             });
         }
 
@@ -1405,30 +1675,73 @@ fetch(host + '/api/v1/logout', {
 
         // 파일 선택 처리
         function handleFileSelect(file, trackId) {
-            const uploadBox = document.querySelector(`[data-track-id="${trackId}"]`);
-            const fileInfo = uploadBox.querySelector('.file-info');
+            const thumbnail = document.querySelector(`[data-track-id="${trackId}"]`);
             
-            // 파일 정보 표시
-            fileInfo.innerHTML = `
-                <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)
-                <button class="remove-file" onclick="removeFile(${trackId})">제거</button>
-            `;
-            fileInfo.style.display = 'block';
+            // 파일 미리보기 생성
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                thumbnail.innerHTML = `
+                    <div class="track-thumbnail-title">${thumbnail.dataset.trackName || '트랙'}</div>
+                    <img src="${e.target.result}" class="track-thumbnail-image" alt="${file.name}">
+                    <div class="track-thumbnail-file-info">
+                        <div style="font-weight: bold; color: #333;">${file.name}</div>
+                        <div>저장: ${new Date(file.lastModified).toLocaleDateString()}</div>
+                        <div>업로드: ${new Date().toLocaleTimeString()}</div>
+                        <div>(신규)</div>
+                        <div style="margin-top: 5px;">
+                            <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 10px; padding: 2px 6px;">취소</button>
+                        </div>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
             
-            uploadBox.classList.add('has-file');
+            thumbnail.classList.add('has-file', 'new-file');
             // 전역 변수에 파일 저장
             trackFiles[trackId] = file;
+            
+            // 예제 코드 업데이트
+            updateRevisionSubmitCode();
         }
 
         // 파일 제거
         function removeFile(trackId) {
-            const uploadBox = document.querySelector(`[data-track-id="${trackId}"]`);
-            const fileInfo = uploadBox.querySelector('.file-info');
+            const thumbnail = document.querySelector(`[data-track-id="${trackId}"]`);
             
-            fileInfo.style.display = 'none';
-            uploadBox.classList.remove('has-file');
-            // 전역 변수에서 파일 제거
+            // 원래 서버 파일 정보로 복원
+            const originalFileData = thumbnail.dataset.originalFile;
+            if (originalFileData) {
+                const originalFile = JSON.parse(originalFileData);
+                // 원래 서버 파일 정보로 복원
+                thumbnail.innerHTML = `
+                    <div class="track-thumbnail-title">${thumbnail.dataset.trackName || '트랙'}</div>
+                    <img src="/files/${originalFile.storedFilename}" class="track-thumbnail-image" alt="${originalFile.originalFilename}">
+                    <div class="track-thumbnail-file-info">
+                        <div style="font-weight: bold; color: #333;">${originalFile.originalFilename}</div>
+                        <div>저장: ${new Date(originalFile.uploadedAt).toLocaleDateString()}</div>
+                        <div>업로드: ${new Date(originalFile.uploadedAt).toLocaleTimeString()}</div>
+                        <div>리비전: ${originalFile.revNo || 'N'}</div>
+                    </div>
+                `;
+                thumbnail.classList.remove('has-file', 'new-file');
+                // 기존 파일로 복원 시에는 has-file 클래스 추가하지 않음 (기본 스타일 유지)
+            } else {
+                // 원래 파일이 없었던 경우 빈 상태로 복원
+                thumbnail.innerHTML = `
+                    <div class="track-thumbnail-title">${thumbnail.dataset.trackName || '트랙'}</div>
+                    <div class="track-thumbnail-placeholder">파일 없음</div>
+                    <div class="track-thumbnail-file-info">
+                        <div>클릭하여 파일 업로드</div>
+                    </div>
+                `;
+                thumbnail.classList.remove('has-file', 'new-file');
+            }
+            
+            // 전역 변수에서 새로 업로드한 파일 제거
             delete trackFiles[trackId];
+            
+            // 예제 코드 업데이트
+            updateRevisionSubmitCode();
         }
 
         // 리비전 서브밋
@@ -1438,7 +1751,7 @@ fetch(host + '/api/v1/logout', {
                 return;
             }
 
-            const uploadBoxes = document.querySelectorAll('.track-upload-box.has-file');
+            const uploadBoxes = document.querySelectorAll('.track-thumbnail.has-file');
             if (uploadBoxes.length === 0) {
                 alert('최소 하나의 파일을 업로드해주세요.');
                 return;
@@ -1510,7 +1823,7 @@ fetch(host + '/api/v1/logout', {
                 return;
             }
 
-            const uploadBoxes = document.querySelectorAll('.track-upload-box.has-file');
+            const uploadBoxes = document.querySelectorAll('.track-thumbnail.has-file');
             const uploads = Array.from(uploadBoxes).map(uploadBox => {
                 const trackId = parseInt(uploadBox.dataset.trackId);
                 const file = trackFiles[trackId];
@@ -1526,23 +1839,70 @@ fetch(host + '/api/v1/logout', {
             });
 
             const code = `const host = '${HOST}';
-const data = {
-  revisionId: ${selectedProject.lastRevision.id},
-  description: "${document.getElementById('revision-description').value || ''}",
-  uploads: ${JSON.stringify(uploads, null, 2)}
-};
 
-fetch(host + '/api/v1/revision/submit', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-  credentials: 'include'
-})
-.then(response => response.json())
-.then(data => console.log(data))
-.catch(error => console.error('Error:', error));`;
+// 파일을 Base64로 변환하는 함수
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      // data:image/jpeg;base64, 부분을 제거하고 순수 Base64만 추출
+      const base64 = reader.result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = error => reject(error);
+  });
+}
+
+// 파일 업로드 처리 함수
+async function submitRevisionWithFiles() {
+  // 실제 파일 입력에서 파일들을 가져오는 방법
+  const fileInputs = document.querySelectorAll('#revision-submit-tab input[type="file"]');
+  const uploads = [];
+  
+  for (let i = 0; i < fileInputs.length; i++) {
+    const fileInput = fileInputs[i];
+    const trackId = parseInt(fileInput.getAttribute('data-track-id'));
+    
+    if (fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      const base64Data = await fileToBase64(file);
+      
+      uploads.push({
+        trackId: trackId,
+        file: {
+          original_filename: file.name,
+          size: file.size,
+          modified_datetime: new Date(file.lastModified).toISOString(),
+          data: base64Data
+        }
+      });
+    }
+  }
+  
+  // API 호출
+  const response = await fetch(host + '/api/v1/revision/submit', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({
+      revisionId: ${selectedProject.lastRevision.id},
+      description: "${document.getElementById('revision-description').value || ''}",
+      uploads: uploads
+    })
+  });
+  
+  const result = await response.json();
+  console.log(result);
+  return result;
+}
+
+// 사용 예시
+submitRevisionWithFiles()
+  .then(data => console.log('제출 완료:', data))
+  .catch(error => console.error('Error:', error));`;
 
             document.getElementById('revision-submit-code').textContent = code;
         }

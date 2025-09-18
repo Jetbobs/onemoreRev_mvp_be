@@ -1,5 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class TrackFileDto {
+  @ApiProperty({ description: '파일 ID' })
+  id: number;
+
+  @ApiProperty({ description: '원본 파일명' })
+  originalFilename: string;
+
+  @ApiProperty({ description: '저장된 파일명' })
+  storedFilename: string;
+
+  @ApiProperty({ description: '파일 크기 (바이트)' })
+  fileSize: number;
+
+  @ApiProperty({ description: 'MIME 타입' })
+  mimeType: string;
+
+  @ApiProperty({ description: '업로드 일시' })
+  uploadedAt: Date;
+}
+
 export class TrackDto {
   @ApiProperty({ description: '트랙 ID' })
   id: number;
@@ -18,4 +38,7 @@ export class TrackDto {
 
   @ApiProperty({ description: '수정일시' })
   updatedAt: Date;
+
+  @ApiProperty({ description: '최신 첨부파일 정보', type: TrackFileDto, required: false })
+  latestFile?: TrackFileDto;
 }
