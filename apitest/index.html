@@ -363,6 +363,70 @@
         .tab-content.active {
             display: block;
         }
+
+        /* 드래그앤드롭 업로드 박스 스타일 */
+        .track-upload-box {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            text-align: center;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .track-upload-box:hover {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+
+        .track-upload-box.dragover {
+            border-color: #007bff;
+            background-color: #e3f2fd;
+            transform: scale(1.02);
+        }
+
+        .track-upload-box.has-file {
+            border-color: #28a745;
+            background-color: #f0fff4;
+        }
+
+        .track-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            background-color: #e9ecef;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #495057;
+        }
+
+        .remove-file {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .remove-file:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -379,6 +443,7 @@
                 <button class="tab-button" onclick="showTab('project-create')">📁 프로젝트생성</button>
                 <button class="tab-button" onclick="showTab('project-list')">📋 프로젝트목록</button>
                 <button class="tab-button" onclick="showTab('project-info')">📄 프로젝트조회</button>
+                <button class="tab-button" onclick="showTab('revision-submit')">📤 리비전제출</button>
             </div>
         </div>
 
@@ -591,6 +656,55 @@
                     </div>
                 </div>
                 <button class="submit-button" onclick="getProjectInfo()">Run</button>
+            </div>
+        </div>
+
+        <!-- 리비전 서브밋 탭 -->
+        <div id="revision-submit-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/v1/revision/submit</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/revision/submit')">복사</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>프로젝트 선택:</label>
+                    <select id="revision-submit-project" onchange="onProjectSelect()">
+                        <option value="">프로젝트를 선택해주세요</option>
+                    </select>
+                </div>
+
+                <div id="revision-info" class="form-group" style="display: none;">
+                    <label>마지막 리비전 ID:</label>
+                    <span id="last-revision-id" style="font-weight: bold; color: #007bff;"></span>
+                </div>
+
+                <div id="tracks-container" style="display: none;">
+                    <label>트랙별 파일 업로드:</label>
+                    <div id="track-upload-boxes"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>리비전 설명 (선택사항):</label>
+                    <textarea id="revision-description" rows="3" placeholder="리비전에 대한 설명을 입력해주세요"></textarea>
+                </div>
+
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('revision-submit-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="revision-submit-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <span class="response-label">응답 결과</span>
+                        <div id="revision-submit-response" class="response" style="display: none;"></div>
+                        <div id="revision-submit-status" class="status-code" style="display: none;"></div>
+                    </div>
+                </div>
+                <button class="submit-button" onclick="submitRevision()">Run</button>
             </div>
         </div>
 
