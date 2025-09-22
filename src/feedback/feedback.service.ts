@@ -224,52 +224,34 @@ export class FeedbackService {
   }
 
   /**
-   * 피드백 목록 조회 (리비전 단위)
+   * 피드백 목록 조회 (리비전 단위) - 게스트 및 프로젝트 소유자 모두 사용 가능
    * @param getFeedbackListDto 피드백 목록 조회 조건
+   * @param userId 로그인된 사용자 ID (선택사항)
    * @returns 피드백 목록 정보
    */
-  async getFeedbackList(getFeedbackListDto: GetFeedbackListDto): Promise<FeedbackListResponseDto> {
-    // 초대 코드로 게스트와 프로젝트 정보 조회
-    const invitation = await this.prisma.invitation.findFirst({
+  async getFeedbackList(getFeedbackListDto: GetFeedbackListDto, userId?: number): Promise<FeedbackListResponseDto> {
+    let projectId: number;
+    let projectName: string;
+    let authorName: string;
+
+    // 리비전 정보 조회
+    const revision = await this.prisma.revision.findFirst({
       where: {
-        code: getFeedbackListDto.code,
+        id: getFeedbackListDto.revisionId,
       },
       include: {
-        guest: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
         project: {
           select: {
             id: true,
             name: true,
+            authorId: true,
           },
         },
       },
     });
 
-    // 초대 코드가 유효하지 않은 경우
-    if (!invitation) {
-      throw new BadRequestException('유효하지 않은 초대 코드입니다.');
-    }
-
-    // 리비전이 해당 프로젝트에 속하는지 확인
-    const revision = await this.prisma.revision.findFirst({
-      where: {
-        id: getFeedbackListDto.revisionId,
-        projectId: invitation.projectId,
-      },
-      select: {
-        id: true,
-        revNo: true,
-        status: true,
-      },
-    });
-
     if (!revision) {
-      throw new NotFoundException('해당 프로젝트의 리비전을 찾을 수 없습니다.');
+      throw new NotFoundException('해당 리비전을 찾을 수 없습니다.');
     }
 
     // 리비전 상태가 'submitted'가 아닌 경우 피드백 조회 불가
@@ -277,14 +259,57 @@ export class FeedbackService {
       throw new BadRequestException(`피드백을 조회할 수 없습니다. 리비전 상태가 'submitted'가 아닙니다. (현재 상태: ${revision.status})`);
     }
 
+    projectId = revision.project.id;
+    projectName = revision.project.name;
+
+    // 로그인된 사용자가 프로젝트 소유자인지 확인
+    if (userId && revision.project.authorId === userId) {
+      // 프로젝트 소유자인 경우
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { name: true },
+      });
+      authorName = user?.name || '프로젝트 소유자';
+    } else if (getFeedbackListDto.code) {
+      // 초대 코드로 게스트 권한 확인
+      const invitation = await this.prisma.invitation.findFirst({
+        where: {
+          code: getFeedbackListDto.code,
+          projectId: projectId,
+        },
+        include: {
+          guest: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      if (!invitation) {
+        throw new BadRequestException('유효하지 않은 초대 코드이거나 해당 프로젝트에 대한 권한이 없습니다.');
+      }
+
+      authorName = invitation.guest.name;
+    } else {
+      // 로그인되지 않았고 초대 코드도 없는 경우
+      throw new BadRequestException('로그인이 필요하거나 유효한 초대 코드를 제공해주세요.');
+    }
+
     // 해당 리비전의 피드백 목록 조회
     const feedbacks = await this.prisma.feedback.findMany({
       where: {
         revisionId: getFeedbackListDto.revisionId,
-        projectId: invitation.projectId,
+        projectId: projectId,
       },
       include: {
         track: {
+          select: {
+            name: true,
+          },
+        },
+        authorGuest: {
           select: {
             name: true,
           },
@@ -303,7 +328,7 @@ export class FeedbackService {
     // 응답 데이터 구성
     const feedbackList = feedbacks.map(feedback => ({
       id: feedback.id,
-      authorName: invitation.guest.name,
+      authorName: feedback.authorGuest.name,
       revisionNo: revision.revNo,
       trackName: feedback.track.name,
       normalX: feedback.normalX,
@@ -317,7 +342,7 @@ export class FeedbackService {
     return {
       success: true,
       message: '피드백 목록을 성공적으로 조회했습니다.',
-      projectName: invitation.project.name,
+      projectName: projectName,
       totalCount,
       solvedCount,
       unsolvedCount,

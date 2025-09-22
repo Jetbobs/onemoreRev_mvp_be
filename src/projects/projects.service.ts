@@ -808,4 +808,88 @@ export class ProjectsService {
       tracks: tracksWithFiles,
     };
   }
+
+  async getProjectHistory(projectId: number, userId: number) {
+    // 프로젝트 존재 여부 및 소유자 확인
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      select: {
+        id: true,
+        name: true,
+        authorId: true,
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundException('프로젝트를 찾을 수 없습니다.');
+    }
+
+    if (project.authorId !== userId) {
+      throw new ForbiddenException('해당 프로젝트에 대한 권한이 없습니다.');
+    }
+
+    // 프로젝트의 모든 리비전과 해당 리비전의 파일, 그리고 해당 리비전에서 새로 생성된 트랙 조회
+    const revisions = await this.prisma.revision.findMany({
+      where: { projectId },
+      orderBy: { revNo: 'asc' },
+      select: {
+        id: true,
+        revNo: true,
+        description: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        files: {
+          select: {
+            id: true,
+            trackId: true,
+            originalFilename: true,
+            storedFilename: true,
+            fileSize: true,
+            mimeType: true,
+            uploadedAt: true,
+          },
+          orderBy: { uploadedAt: 'asc' },
+        },
+      },
+    });
+
+    const createdTracks = await this.prisma.track.findMany({
+      where: { projectId },
+      select: {
+        id: true,
+        name: true,
+        createdRevId: true,
+      },
+    });
+
+    const revisionsWithTracks = revisions.map((rev) => ({
+      id: rev.id,
+      revNo: rev.revNo,
+      description: rev.description || undefined,
+      status: rev.status,
+      createdAt: rev.createdAt,
+      updatedAt: rev.updatedAt,
+      files: rev.files.map((f) => ({
+        id: f.id,
+        trackId: f.trackId,
+        originalFilename: f.originalFilename,
+        storedFilename: f.storedFilename,
+        fileSize: Number(f.fileSize),
+        mimeType: f.mimeType,
+        uploadedAt: f.uploadedAt,
+      })),
+      createdTracks: createdTracks
+        .filter((t) => t.createdRevId === rev.id)
+        .map((t) => ({ id: t.id, name: t.name })),
+    }));
+
+    return {
+      success: true,
+      message: '프로젝트 히스토리를 성공적으로 조회했습니다.',
+      projectId: project.id,
+      projectName: project.name,
+      revisions: revisionsWithTracks,
+    };
+  }
 }

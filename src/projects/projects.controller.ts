@@ -176,4 +176,34 @@ export class ProjectsController {
 
     return this.projectsService.getProjectInfo(getProjectInfoDto, req.session.userId);
   }
+
+  @Get('history')
+  @ApiOperation({
+    summary: '프로젝트 히스토리 조회',
+    description: '프로젝트의 모든 리비전과 각 리비전의 업로드 파일, 해당 리비전에서 생성된 트랙 정보를 조회합니다. 프로젝트 소유자만 접근 가능합니다.'
+  })
+  @ApiQuery({
+    name: 'projectId',
+    description: '조회할 프로젝트 ID',
+    type: 'number',
+    example: 1
+  })
+  @ApiResponse({
+    status: 200,
+    description: '프로젝트 히스토리를 성공적으로 조회했습니다.',
+    type: ProjectInfoResponseDto
+  })
+  @ApiResponse({ status: 401, description: '로그인이 필요합니다.' })
+  @ApiResponse({ status: 403, description: '해당 프로젝트에 대한 권한이 없습니다.' })
+  @ApiResponse({ status: 404, description: '프로젝트를 찾을 수 없습니다.' })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getProjectHistory(
+    @Query('projectId') projectId: number,
+    @Req() req: Request
+  ) {
+    if (!req.session.userId) {
+      throw new UnauthorizedException('로그인이 필요합니다.');
+    }
+    return this.projectsService.getProjectHistory(Number(projectId), req.session.userId);
+  }
 }

@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put, Query, Req, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { DeleteFeedbackResponseDto } from './dto/delete-feedback-response.dto';
 import { DeleteFeedbackDto } from './dto/delete-feedback.dto';
@@ -80,13 +81,13 @@ export class FeedbackController {
   @Get('list')
   @ApiOperation({
     summary: '피드백 목록 조회 (리비전 단위)',
-    description: '게스트(프로젝트 의뢰인)가 특정 리비전의 피드백 목록을 조회합니다. 초대 코드를 통해 권한을 확인합니다.'
+    description: '게스트(프로젝트 의뢰인) 또는 프로젝트 소유자가 특정 리비전의 피드백 목록을 조회합니다. 로그인된 경우 프로젝트 소유자 권한을 확인하고, 그렇지 않은 경우 초대 코드를 통해 게스트 권한을 확인합니다.'
   })
   @ApiQuery({
     name: 'code',
-    description: '초대 코드',
+    description: '초대 코드 (게스트용, 로그인되지 않은 경우 필수)',
     example: 'AbCdEfGhIjKlMnOp',
-    required: true
+    required: false
   })
   @ApiQuery({
     name: 'revisionId',
@@ -101,17 +102,19 @@ export class FeedbackController {
   })
   @ApiResponse({
     status: 400,
-    description: '잘못된 요청 데이터 또는 유효하지 않은 초대 코드입니다.'
+    description: '잘못된 요청 데이터, 유효하지 않은 초대 코드 또는 로그인/초대 코드가 필요합니다.'
   })
   @ApiResponse({
-    status: 403,
-    description: '해당 프로젝트에 대한 권한이 없습니다.'
+    status: 404,
+    description: '해당 리비전을 찾을 수 없습니다.'
   })
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async getFeedbackList(
-    @Query() getFeedbackListDto: GetFeedbackListDto
+    @Query() getFeedbackListDto: GetFeedbackListDto,
+    @Req() req: Request
   ): Promise<FeedbackListResponseDto> {
-    return this.feedbackService.getFeedbackList(getFeedbackListDto);
+    const userId = req.session?.userId;
+    return this.feedbackService.getFeedbackList(getFeedbackListDto, userId);
   }
 
   @Delete('delete')

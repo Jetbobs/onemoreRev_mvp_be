@@ -975,13 +975,13 @@
                 </div>
                 <div class="api-title">피드백 목록 조회 (리비전 단위)</div>
                 <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
-                    게스트(프로젝트 의뢰인)가 특정 리비전의 피드백 목록을 조회합니다.<br>
-                    초대 코드를 통해 권한을 확인합니다.
+                    게스트(프로젝트 의뢰인) 또는 프로젝트 소유자가 특정 리비전의 피드백 목록을 조회합니다.<br>
+                    로그인된 경우 프로젝트 소유자 권한을 확인하고, 그렇지 않은 경우 초대 코드를 통해 게스트 권한을 확인합니다.
                 </p>
                 
                 <div style="margin-bottom: 15px;">
-                    <label for="list-feedback-code" style="display: block; margin-bottom: 5px; font-weight: bold;">초대 코드 (16자리):</label>
-                    <input type="text" id="list-feedback-code" placeholder="AbCdEfGhIjKlMnOp" maxlength="16" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <label for="list-feedback-code" style="display: block; margin-bottom: 5px; font-weight: bold;">초대 코드 (16자리, 게스트용):</label>
+                    <input type="text" id="list-feedback-code" placeholder="AbCdEfGhIjKlMnOp (로그인되지 않은 경우 필수)" maxlength="16" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 </div>
                 
                 <div style="margin-bottom: 15px;">
@@ -2159,17 +2159,21 @@ submitRevisionWithFiles()
             const code = document.getElementById('list-feedback-code').value;
             const revisionId = parseInt(document.getElementById('list-feedback-revision-id').value);
 
-            if (!code || !revisionId) {
-                alert('초대 코드와 리비전 ID는 필수입니다.');
+            if (!revisionId) {
+                alert('리비전 ID는 필수입니다.');
                 return;
             }
 
             try {
                 // URL 파라미터 구성
                 const params = new URLSearchParams({
-                    code: code,
                     revisionId: revisionId
                 });
+
+                // 초대 코드가 있는 경우에만 추가
+                if (code) {
+                    params.append('code', code);
+                }
 
                 const response = await fetch(HOST + '/api/v1/feedback/list?' + params.toString(), {
                     method: 'GET',
