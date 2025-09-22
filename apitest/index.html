@@ -63,6 +63,12 @@
         .http-method.post {
             background-color: #49cc90;
         }
+        .http-method.put {
+            background-color: #fca130;
+        }
+        .http-method.delete {
+            background-color: #f93e3e;
+        }
         .form-group {
             margin-bottom: 15px;
         }
@@ -523,6 +529,7 @@
                 <button class="tab-button" onclick="showTab('feedback-edit')">✏️ 피드백수정</button>
                 <button class="tab-button" onclick="showTab('feedback-list')">📋 피드백목록</button>
                 <button class="tab-button" onclick="showTab('feedback-delete')">🗑️ 피드백삭제</button>
+                <button class="tab-button" onclick="showTab('history')">📊 히스토리</button>
             </div>
         </div>
 
@@ -1023,6 +1030,40 @@
                 </div>
                 
                 <button onclick="deleteFeedback()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">피드백 삭제</button>
+            </div>
+        </div>
+
+        <!-- 히스토리 탭 -->
+        <div id="history-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method get">GET</span>
+                    <span>/api/v1/project/history</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/project/history')">복사</button>
+                </div>
+                <div class="api-title">프로젝트 히스토리 조회</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    프로젝트의 모든 리비전과 각 리비전의 업로드 파일, 해당 리비전에서 생성된 트랙 정보를 조회합니다.<br>
+                    프로젝트 소유자만 접근 가능합니다.
+                </p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="history-project-id" style="display: block; margin-bottom: 5px; font-weight: bold;">프로젝트 ID:</label>
+                    <input type="number" id="history-project-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <button onclick="getProjectHistory()" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">히스토리 조회</button>
+                
+                <div class="code-response-container" style="margin-top: 20px;">
+                    <div class="code-section">
+                        <label class="response-label">요청 코드:</label>
+                        <div id="history-request-code" class="response">버튼을 클릭하면 요청 코드가 표시됩니다.</div>
+                    </div>
+                    <div class="response-section">
+                        <label class="response-label">응답 결과:</label>
+                        <div id="history-response" class="response">버튼을 클릭하면 응답 결과가 표시됩니다.</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2276,6 +2317,38 @@ submitRevisionWithFiles()
                 }
             } catch (error) {
                 alert('네트워크 오류: ' + error.message);
+            }
+        }
+
+        // 프로젝트 히스토리 조회
+        async function getProjectHistory() {
+            const projectId = document.getElementById('history-project-id').value;
+            
+            if (!projectId) {
+                alert('프로젝트 ID를 입력해주세요.');
+                return;
+            }
+
+            // 요청 코드 업데이트
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/project/history?projectId=${projectId}', {
+  method: 'GET',
+  credentials: 'include'
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            document.getElementById('history-request-code').textContent = code;
+
+            try {
+                const response = await fetch(`${API_BASE}/project/history?projectId=${projectId}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                showResponse('history-response', result, !response.ok);
+            } catch (error) {
+                showResponse('history-response', { error: error.message }, true);
             }
         }
     </script>

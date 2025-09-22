@@ -870,6 +870,9 @@ export class ProjectsService {
       status: rev.status,
       createdAt: rev.createdAt,
       updatedAt: rev.updatedAt,
+      createdTracks: createdTracks
+        .filter((t) => t.createdRevId === rev.id)
+        .map((t) => ({ id: t.id, name: t.name })),
       files: rev.files.map((f) => ({
         id: f.id,
         trackId: f.trackId,
@@ -879,9 +882,6 @@ export class ProjectsService {
         mimeType: f.mimeType,
         uploadedAt: f.uploadedAt,
       })),
-      createdTracks: createdTracks
-        .filter((t) => t.createdRevId === rev.id)
-        .map((t) => ({ id: t.id, name: t.name })),
     }));
 
     return {

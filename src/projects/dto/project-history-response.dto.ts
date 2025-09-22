@@ -50,11 +50,11 @@ export class ProjectHistoryRevisionDto {
   @ApiProperty({ description: '업데이트 일시' })
   updatedAt: Date;
 
-  @ApiProperty({ type: [ProjectHistoryFileDto], description: '리비전에서 업로드된 파일 목록' })
-  files: ProjectHistoryFileDto[];
-
   @ApiProperty({ type: [ProjectHistoryTrackDto], description: '해당 리비전에서 새로 생성된 트랙 목록' })
   createdTracks: ProjectHistoryTrackDto[];
+
+  @ApiProperty({ type: [ProjectHistoryFileDto], description: '리비전에서 업로드된 파일 목록' })
+  files: ProjectHistoryFileDto[];
 }
 
 export class ProjectHistoryResponseDto {
