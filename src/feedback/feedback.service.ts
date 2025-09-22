@@ -1,6 +1,10 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AddFeedbackReplyResponseDto } from './dto/add-feedback-reply-response.dto';
+import { AddFeedbackReplyDto } from './dto/add-feedback-reply.dto';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
+import { DeleteFeedbackReplyResponseDto } from './dto/delete-feedback-reply-response.dto';
+import { DeleteFeedbackReplyDto } from './dto/delete-feedback-reply.dto';
 import { DeleteFeedbackResponseDto } from './dto/delete-feedback-response.dto';
 import { DeleteFeedbackDto } from './dto/delete-feedback.dto';
 import { EditFeedbackResponseDto } from './dto/edit-feedback-response.dto';
@@ -429,6 +433,179 @@ export class FeedbackService {
       revisionNo: existingFeedback.revision.revNo,
       trackName: existingFeedback.track.name,
       content: existingFeedback.content,
+    };
+  }
+
+  /**
+   * 피드백에 답글 추가 (프로젝트 소유자용)
+   * @param addFeedbackReplyDto 답글 추가 데이터
+   * @param userId 사용자 ID (프로젝트 소유자)
+   * @returns 답글 추가 결과
+   */
+  async addFeedbackReply(
+    addFeedbackReplyDto: AddFeedbackReplyDto,
+    userId: number,
+  ): Promise<AddFeedbackReplyResponseDto> {
+    // 피드백 존재 여부 및 프로젝트 소유자 확인
+    const feedback = await this.prisma.feedback.findUnique({
+      where: { id: addFeedbackReplyDto.feedbackId },
+      include: {
+        project: {
+          select: {
+            id: true,
+            name: true,
+            authorId: true,
+          },
+        },
+        revision: {
+          select: {
+            id: true,
+            revNo: true,
+            status: true,
+          },
+        },
+        track: {
+          select: {
+            name: true,
+          },
+        },
+        authorGuest: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!feedback) {
+      throw new NotFoundException('피드백을 찾을 수 없습니다.');
+    }
+
+    // 프로젝트 소유자 확인
+    if (feedback.project.authorId !== userId) {
+      throw new ForbiddenException('해당 피드백에 답글을 작성할 권한이 없습니다.');
+    }
+
+    // 리비전 상태가 'reviewed'가 아닌 경우 답글 작성 불가
+    if (feedback.revision.status !== 'reviewed') {
+      throw new BadRequestException(`피드백에 답글을 작성할 수 없습니다. 리비전 상태가 'reviewed'가 아닙니다. (현재 상태: ${feedback.revision.status})`);
+    }
+
+    // 피드백 답글 업데이트
+    const updatedFeedback = await this.prisma.feedback.update({
+      where: { id: addFeedbackReplyDto.feedbackId },
+      data: {
+        reply: addFeedbackReplyDto.reply,
+      },
+      select: {
+        id: true,
+        content: true,
+        reply: true,
+        solved: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: '피드백 답글이 성공적으로 설정되었습니다.',
+      feedbackId: feedback.id,
+      authorName: feedback.authorGuest.name,
+      projectName: feedback.project.name,
+      revisionNo: feedback.revision.revNo,
+      trackName: feedback.track.name,
+      content: feedback.content,
+      reply: updatedFeedback.reply,
+      solved: updatedFeedback.solved,
+      repliedAt: updatedFeedback.updatedAt,
+    };
+  }
+
+  /**
+   * 피드백 답글 삭제 (프로젝트 소유자용)
+   * @param deleteFeedbackReplyDto 답글 삭제 데이터
+   * @param userId 사용자 ID (프로젝트 소유자)
+   * @returns 답글 삭제 결과
+   */
+  async deleteFeedbackReply(
+    deleteFeedbackReplyDto: DeleteFeedbackReplyDto,
+    userId: number,
+  ): Promise<DeleteFeedbackReplyResponseDto> {
+    // 피드백 존재 여부 및 프로젝트 소유자 확인
+    const feedback = await this.prisma.feedback.findUnique({
+      where: { id: deleteFeedbackReplyDto.feedbackId },
+      include: {
+        project: {
+          select: {
+            id: true,
+            name: true,
+            authorId: true,
+          },
+        },
+        revision: {
+          select: {
+            id: true,
+            revNo: true,
+            status: true,
+          },
+        },
+        track: {
+          select: {
+            name: true,
+          },
+        },
+        authorGuest: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!feedback) {
+      throw new NotFoundException('피드백을 찾을 수 없습니다.');
+    }
+
+    // 프로젝트 소유자 확인
+    if (feedback.project.authorId !== userId) {
+      throw new ForbiddenException('해당 피드백의 답글을 삭제할 권한이 없습니다.');
+    }
+
+    // 리비전 상태가 'reviewed'가 아닌 경우 답글 삭제 불가
+    if (feedback.revision.status !== 'reviewed') {
+      throw new BadRequestException(`피드백 답글을 삭제할 수 없습니다. 리비전 상태가 'reviewed'가 아닙니다. (현재 상태: ${feedback.revision.status})`);
+    }
+
+    // 기존 답글 내용 저장
+    const existingReply = feedback.reply;
+
+    // 피드백 답글 삭제 (null로 설정)
+    const updatedFeedback = await this.prisma.feedback.update({
+      where: { id: deleteFeedbackReplyDto.feedbackId },
+      data: {
+        reply: null,
+      },
+      select: {
+        id: true,
+        content: true,
+        reply: true,
+        solved: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: '피드백 답글이 성공적으로 삭제되었습니다.',
+      feedbackId: feedback.id,
+      authorName: feedback.authorGuest.name,
+      projectName: feedback.project.name,
+      revisionNo: feedback.revision.revNo,
+      trackName: feedback.track.name,
+      content: feedback.content,
+      deletedReply: existingReply,
+      solved: updatedFeedback.solved,
+      deletedAt: updatedFeedback.updatedAt,
     };
   }
 }

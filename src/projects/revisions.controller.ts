@@ -17,6 +17,8 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
+import { ReviewDoneResponseDto } from '../revisions/dto/review-done-response.dto';
+import { ReviewDoneDto } from '../revisions/dto/review-done.dto';
 import { GetRevisionInfoDto } from './dto/get-revision-info.dto';
 import { RevisionInfoResponseDto } from './dto/revision-info-response.dto';
 import { SubmitRevisionResponseDto } from './dto/submit-revision-response.dto';
@@ -114,5 +116,38 @@ export class RevisionsController {
     }
 
     return this.projectsService.getRevisionInfo(getRevisionInfoDto, req.session.userId);
+  }
+
+  @Post('review/done')
+  @ApiOperation({
+    summary: '리비전 리뷰 완료 (게스트용)',
+    description: '게스트(프로젝트 의뢰인)가 리비전 리뷰를 완료합니다. submitted 상태의 리비전을 reviewed 상태로 변경합니다.'
+  })
+  @ApiBody({
+    type: ReviewDoneDto,
+    description: '리뷰 완료 정보'
+  })
+  @ApiResponse({
+    status: 201,
+    description: '리비전 리뷰가 성공적으로 완료되었습니다.',
+    type: ReviewDoneResponseDto
+  })
+  @ApiResponse({
+    status: 400,
+    description: '잘못된 요청 데이터입니다.'
+  })
+  @ApiResponse({
+    status: 404,
+    description: '유효하지 않은 초대 코드이거나 리비전을 찾을 수 없습니다.'
+  })
+  @ApiResponse({
+    status: 403,
+    description: '해당 리비전에 대한 권한이 없습니다.'
+  })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async reviewDone(
+    @Body() reviewDoneDto: ReviewDoneDto
+  ): Promise<ReviewDoneResponseDto> {
+    return this.projectsService.reviewDone(reviewDoneDto);
   }
 }

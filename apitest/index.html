@@ -338,11 +338,40 @@
         .tab-container {
             margin-bottom: 20px;
         }
+        .tab-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .tab-group {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 5px;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .tab-group-title {
+            font-weight: bold;
+            font-size: 60%;
+            color: #495057;
+            margin: 0; /* inline 레이아웃 */
+            padding: 0 6px 0 0;
+            border: 0;
+            flex: 0 0 auto;
+        }
+        
         .tab-buttons {
-            display: flex !important;
+            display: inline-flex !important;
             gap: 2.5px !important;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap; /* 줄바꿈 방지 */
+            flex: 1 1 auto;
         }
         .tab-button {
             background-color: #f8f9fa;
@@ -514,22 +543,59 @@
         
         <!-- 탭 버튼들 -->
         <div class="tab-container">
-            <div class="tab-buttons">
-                <button class="tab-button active" onclick="showTab('signup')">📝 회원가입</button>
-                <button class="tab-button" onclick="showTab('login')">🔐 로그인</button>
-                <button class="tab-button" onclick="showTab('logout')">🚪 로그아웃</button>
-                <button class="tab-button" onclick="showTab('profile')">👤 프로필 조회</button>
-                <button class="tab-button" onclick="showTab('project-create')">📁 프로젝트생성</button>
-                <button class="tab-button" onclick="showTab('project-list')">📋 프로젝트목록</button>
-                <button class="tab-button" onclick="showTab('project-info')">📄 프로젝트조회</button>
-                <button class="tab-button" onclick="showTab('track-add')">🎵 트랙추가</button>
-                <button class="tab-button" onclick="showTab('revision-info')">📋 리비전조회</button>
-                <button class="tab-button" onclick="showTab('revision-submit')">📤 리비전제출</button>
-                <button class="tab-button" onclick="showTab('feedback')">💬 피드백등록</button>
-                <button class="tab-button" onclick="showTab('feedback-edit')">✏️ 피드백수정</button>
-                <button class="tab-button" onclick="showTab('feedback-list')">📋 피드백목록</button>
-                <button class="tab-button" onclick="showTab('feedback-delete')">🗑️ 피드백삭제</button>
-                <button class="tab-button" onclick="showTab('history')">📊 히스토리</button>
+            <div class="tab-groups">
+                <!-- 인증 그룹 -->
+                <div class="tab-group">
+                    <div class="tab-group-title">인증</div>
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="showTab('signup')">📝 회원가입</button>
+                        <button class="tab-button" onclick="showTab('login')">🔐 로그인</button>
+                        <button class="tab-button" onclick="showTab('logout')">🚪 로그아웃</button>
+                        <button class="tab-button" onclick="showTab('profile')">👤 프로필조회</button>
+                    </div>
+                </div>
+                
+                <!-- 프로젝트 그룹 -->
+                <div class="tab-group">
+                    <div class="tab-group-title">프로젝트</div>
+                    <div class="tab-buttons">
+                        <button class="tab-button" onclick="showTab('project-create')">📁 프로젝트생성</button>
+                        <button class="tab-button" onclick="showTab('project-list')">📋 프로젝트목록</button>
+                        <button class="tab-button" onclick="showTab('project-info')">📄 프로젝트조회</button>
+                        <button class="tab-button" onclick="showTab('track-add')">🎵 트랙추가</button>
+                        <button class="tab-button" onclick="showTab('history')">📊 히스토리</button>
+                    </div>
+                </div>
+                
+                <!-- 리비전 그룹 -->
+                <div class="tab-group">
+                    <div class="tab-group-title">리비전</div>
+                    <div class="tab-buttons">
+                        <button class="tab-button" onclick="showTab('revision-info')">📋 리비전조회</button>
+                        <button class="tab-button" onclick="showTab('revision-submit')">📤 리비전제출</button>
+                        <button class="tab-button" onclick="showTab('revision-review-done')">✅ 리뷰완료</button>
+                    </div>
+                </div>
+                
+                <!-- 피드백 그룹 -->
+                <div class="tab-group">
+                    <div class="tab-group-title">피드백</div>
+                    <div class="tab-buttons">
+                        <button class="tab-button" onclick="showTab('feedback')">💬 피드백등록</button>
+                        <button class="tab-button" onclick="showTab('feedback-edit')">✏️ 피드백수정</button>
+                        <button class="tab-button" onclick="showTab('feedback-delete')">🗑️ 피드백삭제</button>
+                        <button class="tab-button" onclick="showTab('feedback-list')">📋 피드백목록</button>
+                    </div>
+                </div>
+                
+                <!-- 답글 그룹 -->
+                <div class="tab-group">
+                    <div class="tab-group-title">답글</div>
+                    <div class="tab-buttons">
+                        <button class="tab-button" onclick="showTab('feedback-reply-set')">💬 답글설정</button>
+                        <button class="tab-button" onclick="showTab('feedback-reply-delete')">🗑️ 답글삭제</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -886,13 +952,52 @@
             </div>
         </div>
 
+        <!-- 리비전 리뷰 완료 탭 -->
+        <div id="revision-review-done-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/v1/revision/review/done</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/revision/review/done')">복사</button>
+                </div>
+                <div class="api-title">리비전 리뷰 완료 (게스트용)</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    게스트(프로젝트 의뢰인)가 리비전 리뷰를 완료합니다.<br>
+                    submitted 상태의 리비전을 reviewed 상태로 변경합니다.
+                </p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="review-done-code" style="display: block; margin-bottom: 5px; font-weight: bold;">초대 코드 (16자리):</label>
+                    <input type="text" id="review-done-code" placeholder="AbCdEfGhIjKlMnOp" maxlength="16" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="review-done-revision-id" style="display: block; margin-bottom: 5px; font-weight: bold;">리비전 ID:</label>
+                    <input type="number" id="review-done-revision-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <button onclick="reviewDone()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">리뷰 완료</button>
+                
+                <div class="code-response-container" style="margin-top: 20px;">
+                    <div class="code-section">
+                        <label class="response-label">요청 코드:</label>
+                        <div id="review-done-request-code" class="response">버튼을 클릭하면 요청 코드가 표시됩니다.</div>
+                    </div>
+                    <div class="response-section">
+                        <label class="response-label">응답 결과:</label>
+                        <div id="review-done-response" class="response">버튼을 클릭하면 응답 결과가 표시됩니다.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 피드백 등록 탭 -->
         <div id="feedback-tab" class="tab-content">
             <div class="api-section">
                 <div class="api-url">
                     <span class="http-method post">POST</span>
-                    <span>/api/v1/feedback/add</span>
-                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/add')">복사</button>
+                    <span>/api/v1/feedback</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback')">복사</button>
                 </div>
                 <div class="api-title">피드백 등록 (게스트용)</div>
                 <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
@@ -944,8 +1049,8 @@
             <div class="api-section">
                 <div class="api-url">
                     <span class="http-method put">PUT</span>
-                    <span>/api/v1/feedback/edit</span>
-                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/edit')">복사</button>
+                    <span>/api/v1/feedback</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback')">복사</button>
                 </div>
                 <div class="api-title">피드백 수정 (게스트용)</div>
                 <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
@@ -977,8 +1082,8 @@
             <div class="api-section">
                 <div class="api-url">
                     <span class="http-method get">GET</span>
-                    <span>/api/v1/feedback/list</span>
-                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/list')">복사</button>
+                    <span>/api/v1/feedback</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback')">복사</button>
                 </div>
                 <div class="api-title">피드백 목록 조회 (리비전 단위)</div>
                 <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
@@ -1010,8 +1115,8 @@
             <div class="api-section">
                 <div class="api-url">
                     <span class="http-method delete">DELETE</span>
-                    <span>/api/v1/feedback/delete</span>
-                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/delete')">복사</button>
+                    <span>/api/v1/feedback</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback')">복사</button>
                 </div>
                 <div class="api-title">피드백 삭제 (게스트용)</div>
                 <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
@@ -1030,6 +1135,79 @@
                 </div>
                 
                 <button onclick="deleteFeedback()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">피드백 삭제</button>
+            </div>
+        </div>
+
+        <!-- 피드백 답글 설정 탭 -->
+        <div id="feedback-reply-set-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/v1/feedback/reply</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/reply')">복사</button>
+                </div>
+                <div class="api-title">피드백 답글 설정 (소유자용)</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    프로젝트 소유자가 피드백에 답글을 설정합니다. 기존 답글이 있으면 덮어씁니다.<br>
+                    리비전 상태가 'reviewed'일 때만 가능합니다.
+                </p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="reply-set-feedback-id" style="display: block; margin-bottom: 5px; font-weight: bold;">피드백 ID:</label>
+                    <input type="number" id="reply-set-feedback-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="reply-set-content" style="display: block; margin-bottom: 5px; font-weight: bold;">답글 내용:</label>
+                    <textarea id="reply-set-content" placeholder="피드백을 확인했습니다. 수정하겠습니다." rows="4" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"></textarea>
+                </div>
+                
+                <button onclick="setFeedbackReply()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">답글 설정</button>
+                
+                <div class="code-response-container" style="margin-top: 20px;">
+                    <div class="code-section">
+                        <label class="response-label">요청 코드:</label>
+                        <div id="reply-set-request-code" class="response">버튼을 클릭하면 요청 코드가 표시됩니다.</div>
+                    </div>
+                    <div class="response-section">
+                        <label class="response-label">응답 결과:</label>
+                        <div id="reply-set-response" class="response">버튼을 클릭하면 응답 결과가 표시됩니다.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 피드백 답글 삭제 탭 -->
+        <div id="feedback-reply-delete-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method delete">DELETE</span>
+                    <span>/api/v1/feedback/reply</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/reply')">복사</button>
+                </div>
+                <div class="api-title">피드백 답글 삭제 (소유자용)</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    프로젝트 소유자가 피드백의 답글을 삭제합니다.<br>
+                    리비전 상태가 'reviewed'일 때만 가능합니다.
+                </p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="reply-delete-feedback-id" style="display: block; margin-bottom: 5px; font-weight: bold;">피드백 ID:</label>
+                    <input type="number" id="reply-delete-feedback-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <button onclick="deleteFeedbackReply()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">답글 삭제</button>
+                
+                <div class="code-response-container" style="margin-top: 20px;">
+                    <div class="code-section">
+                        <label class="response-label">요청 코드:</label>
+                        <div id="reply-delete-request-code" class="response">버튼을 클릭하면 요청 코드가 표시됩니다.</div>
+                    </div>
+                    <div class="response-section">
+                        <label class="response-label">응답 결과:</label>
+                        <div id="reply-delete-response" class="response">버튼을 클릭하면 응답 결과가 표시됩니다.</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2116,7 +2294,7 @@ submitRevisionWithFiles()
             }
 
             try {
-                const response = await fetch(HOST + '/api/v1/feedback/add', {
+                const response = await fetch(HOST + '/api/v1/feedback', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2163,7 +2341,7 @@ submitRevisionWithFiles()
             }
 
             try {
-                const response = await fetch(HOST + '/api/v1/feedback/edit', {
+                const response = await fetch(HOST + '/api/v1/feedback', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2216,7 +2394,7 @@ submitRevisionWithFiles()
                     params.append('code', code);
                 }
 
-                const response = await fetch(HOST + '/api/v1/feedback/list?' + params.toString(), {
+                const response = await fetch(HOST + '/api/v1/feedback?' + params.toString(), {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2291,7 +2469,7 @@ submitRevisionWithFiles()
             }
 
             try {
-                const response = await fetch(HOST + '/api/v1/feedback/delete', {
+                const response = await fetch(HOST + '/api/v1/feedback', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2317,6 +2495,147 @@ submitRevisionWithFiles()
                 }
             } catch (error) {
                 alert('네트워크 오류: ' + error.message);
+            }
+        }
+
+        // 피드백 답글 설정
+        async function setFeedbackReply() {
+            const feedbackId = parseInt(document.getElementById('reply-set-feedback-id').value);
+            const reply = document.getElementById('reply-set-content').value;
+
+            if (!feedbackId || !reply) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+
+            // 요청 코드 업데이트
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/feedback/reply', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include',
+  body: JSON.stringify({
+    feedbackId: ${feedbackId},
+    reply: "${reply}"
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            document.getElementById('reply-set-request-code').textContent = code;
+
+            try {
+                const response = await fetch(`${API_BASE}/feedback/reply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        feedbackId: feedbackId,
+                        reply: reply
+                    })
+                });
+                const result = await response.json();
+                showResponse('reply-set-response', result, !response.ok);
+            } catch (error) {
+                showResponse('reply-set-response', { error: error.message }, true);
+            }
+        }
+
+        // 피드백 답글 삭제
+        async function deleteFeedbackReply() {
+            const feedbackId = parseInt(document.getElementById('reply-delete-feedback-id').value);
+
+            if (!feedbackId) {
+                alert('피드백 ID를 입력해주세요.');
+                return;
+            }
+
+            // 삭제 확인
+            if (!confirm('정말로 이 피드백의 답글을 삭제하시겠습니까?')) {
+                return;
+            }
+
+            // 요청 코드 업데이트
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/feedback/reply', {
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include',
+  body: JSON.stringify({
+    feedbackId: ${feedbackId}
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            document.getElementById('reply-delete-request-code').textContent = code;
+
+            try {
+                const response = await fetch(`${API_BASE}/feedback/reply`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        feedbackId: feedbackId
+                    })
+                });
+                const result = await response.json();
+                showResponse('reply-delete-response', result, !response.ok);
+            } catch (error) {
+                showResponse('reply-delete-response', { error: error.message }, true);
+            }
+        }
+
+        // 리비전 리뷰 완료
+        async function reviewDone() {
+            const code = document.getElementById('review-done-code').value;
+            const revisionId = parseInt(document.getElementById('review-done-revision-id').value);
+
+            if (!code || !revisionId) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+
+            // 요청 코드 업데이트
+            const codeText = `const host = '${HOST}';
+fetch(host + '/api/v1/revision/review/done', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    code: "${code}",
+    revisionId: ${revisionId}
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            document.getElementById('review-done-request-code').textContent = codeText;
+
+            try {
+                const response = await fetch(`${API_BASE}/revision/review/done`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        revisionId: revisionId
+                    })
+                });
+                const result = await response.json();
+                showResponse('review-done-response', result, !response.ok);
+            } catch (error) {
+                showResponse('review-done-response', { error: error.message }, true);
             }
         }
 

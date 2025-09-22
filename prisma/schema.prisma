@@ -167,6 +167,7 @@ model Feedback {
   normalX    Float   // 정규화된 X 좌표
   normalY    Float   // 정규화된 Y 좌표
   content    String  @db.Text // 피드백 내용
+  reply      String? @db.Text // 답변 내용 (nullable)
   solved     Boolean @default(false) // 해결 여부
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

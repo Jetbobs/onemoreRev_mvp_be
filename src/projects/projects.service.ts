@@ -3,6 +3,8 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { PrismaService } from '../prisma/prisma.service';
+import { ReviewDoneResponseDto } from '../revisions/dto/review-done-response.dto';
+import { ReviewDoneDto } from '../revisions/dto/review-done.dto';
 import { AddTrackResponseDto } from './dto/add-track-response.dto';
 import { AddTrackDto } from './dto/add-track.dto';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -890,6 +892,88 @@ export class ProjectsService {
       projectId: project.id,
       projectName: project.name,
       revisions: revisionsWithTracks,
+    };
+  }
+
+  /**
+   * 리비전 리뷰 완료 (게스트용)
+   * @param reviewDoneDto 리뷰 완료 데이터
+   * @returns 리뷰 완료 결과
+   */
+  async reviewDone(reviewDoneDto: ReviewDoneDto): Promise<ReviewDoneResponseDto> {
+    // 초대 코드로 게스트 및 프로젝트 확인
+    const invitation = await this.prisma.invitation.findUnique({
+      where: { code: reviewDoneDto.code },
+      include: {
+        guest: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        project: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!invitation) {
+      throw new NotFoundException('유효하지 않은 초대 코드입니다.');
+    }
+
+    // 리비전 존재 여부 및 프로젝트 매칭 확인
+    const revision = await this.prisma.revision.findUnique({
+      where: { id: reviewDoneDto.revisionId },
+      include: {
+        project: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!revision) {
+      throw new NotFoundException('리비전을 찾을 수 없습니다.');
+    }
+
+    // 리비전이 해당 프로젝트에 속하는지 확인
+    if (revision.projectId !== invitation.projectId) {
+      throw new ForbiddenException('해당 리비전에 대한 권한이 없습니다.');
+    }
+
+    // 리비전 상태가 'submitted'가 아닌 경우 실패
+    if (revision.status !== 'submitted') {
+      throw new BadRequestException(`리뷰를 완료할 수 없습니다. 리비전 상태가 'submitted'가 아닙니다. (현재 상태: ${revision.status})`);
+    }
+
+    // 리비전 상태를 'reviewed'로 업데이트
+    const updatedRevision = await this.prisma.revision.update({
+      where: { id: reviewDoneDto.revisionId },
+      data: {
+        status: 'reviewed',
+      },
+      select: {
+        id: true,
+        revNo: true,
+        status: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: '리비전 리뷰가 성공적으로 완료되었습니다.',
+      revisionId: updatedRevision.id,
+      revisionNo: updatedRevision.revNo,
+      projectId: revision.project.id,
+      projectName: revision.project.name,
+      status: updatedRevision.status,
+      reviewedAt: updatedRevision.updatedAt,
     };
   }
 }
