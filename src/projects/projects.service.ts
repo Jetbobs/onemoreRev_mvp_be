@@ -21,6 +21,16 @@ import { SubmitRevisionDto } from './dto/submit-revision.dto';
 export class ProjectsService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * base64 형식의 16자리 랜덤 코드 생성
+   * @returns 16자리 base64 인코딩된 랜덤 문자열
+   */
+  private generateInvitationCode(): string {
+    // 12바이트 랜덤 데이터 생성 (base64로 인코딩하면 16자리가 됨)
+    const randomBytes = crypto.randomBytes(12);
+    return randomBytes.toString('base64');
+  }
+
   async createProject(
     createProjectDto: CreateProjectDto,
     userId: number,
@@ -99,11 +109,12 @@ export class ProjectsService {
             },
           });
 
-          // 초대 생성
+          // 초대 생성 (랜덤 코드 포함)
           await tx.invitation.create({
             data: {
               projectId: project.id,
               guestId: guest.id,
+              code: this.generateInvitationCode(),
             },
           });
 

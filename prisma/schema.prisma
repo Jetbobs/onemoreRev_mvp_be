@@ -41,6 +41,7 @@ model Project {
   revisions   Revision[]
   tracks      Track[]
   invitations Invitation[]
+  feedbacks   Feedback[]
 
   @@map("projects")
 }
@@ -59,6 +60,7 @@ model Revision {
   project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdTracks Track[] @relation("TrackCreatedRevision")
   files        File[]
+  feedbacks    Feedback[]
 
   // 인덱스
   @@index([projectId])
@@ -80,6 +82,7 @@ model Track {
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdRev  Revision @relation("TrackCreatedRevision", fields: [createdRevId], references: [id], onDelete: Cascade)
   files       File[]
+  feedbacks   Feedback[]
 
   // 인덱스
   @@index([projectId])
@@ -101,6 +104,7 @@ model Guest {
   // 관계
   hostUser    User          @relation(fields: [host], references: [id], onDelete: Cascade)
   invitations Invitation[]
+  feedbacks   Feedback[]
 
   // 인덱스
   @@index([host])
@@ -112,6 +116,7 @@ model Invitation {
   id        Int      @id @default(autoincrement())
   projectId Int      // 프로젝트 ID (외래키)
   guestId   Int      // 게스트 ID (외래키)
+  code      String?  @db.Char(16) // 초대 코드 (nullable)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -122,6 +127,7 @@ model Invitation {
   // 인덱스
   @@index([projectId])
   @@index([guestId])
+  @@index([code]) // code 컬럼 인덱스
   @@unique([projectId, guestId]) // 같은 프로젝트에 같은 게스트는 한 번만 초대 가능
   @@map("invitations")
 }
@@ -149,4 +155,33 @@ model File {
   @@index([revisionId])
   @@index([trackId])
   @@map("files")
+}
+
+// Feedback 모델
+model Feedback {
+  id         Int     @id @default(autoincrement())
+  author     Int     // 작성자 ID (외래키 -> guests.id)
+  projectId  Int     // 프로젝트 ID (외래키)
+  revisionId Int     // 리비전 ID (외래키)
+  trackId    Int     // 트랙 ID (외래키)
+  normalX    Float   // 정규화된 X 좌표
+  normalY    Float   // 정규화된 Y 좌표
+  content    String  @db.Text // 피드백 내용
+  solved     Boolean @default(false) // 해결 여부
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // 관계
+  authorGuest Guest    @relation(fields: [author], references: [id], onDelete: Cascade)
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  revision    Revision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  track       Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  // 인덱스
+  @@index([author])
+  @@index([projectId])
+  @@index([revisionId])
+  @@index([trackId])
+  @@index([solved])
+  @@map("feedbacks")
 }

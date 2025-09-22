@@ -519,6 +519,10 @@
                 <button class="tab-button" onclick="showTab('track-add')">🎵 트랙추가</button>
                 <button class="tab-button" onclick="showTab('revision-info')">📋 리비전조회</button>
                 <button class="tab-button" onclick="showTab('revision-submit')">📤 리비전제출</button>
+                <button class="tab-button" onclick="showTab('feedback')">💬 피드백등록</button>
+                <button class="tab-button" onclick="showTab('feedback-edit')">✏️ 피드백수정</button>
+                <button class="tab-button" onclick="showTab('feedback-list')">📋 피드백목록</button>
+                <button class="tab-button" onclick="showTab('feedback-delete')">🗑️ 피드백삭제</button>
             </div>
         </div>
 
@@ -872,6 +876,153 @@
                     </div>
                 </div>
                 <button class="submit-button" onclick="logout()">Run</button>
+            </div>
+        </div>
+
+        <!-- 피드백 등록 탭 -->
+        <div id="feedback-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/v1/feedback/add</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/add')">복사</button>
+                </div>
+                <div class="api-title">피드백 등록 (게스트용)</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    게스트(프로젝트 의뢰인)가 디자인에 대한 피드백을 등록합니다.<br>
+                    초대 코드를 통해 권한을 확인합니다.
+                </p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="feedback-code" style="display: block; margin-bottom: 5px; font-weight: bold;">초대 코드 (16자리):</label>
+                    <input type="text" id="feedback-code" placeholder="AbCdEfGhIjKlMnOp" maxlength="16" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="feedback-project-id" style="display: block; margin-bottom: 5px; font-weight: bold;">프로젝트 ID:</label>
+                    <input type="number" id="feedback-project-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="feedback-revision-id" style="display: block; margin-bottom: 5px; font-weight: bold;">리비전 ID:</label>
+                    <input type="number" id="feedback-revision-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="feedback-track-id" style="display: block; margin-bottom: 5px; font-weight: bold;">트랙 ID:</label>
+                    <input type="number" id="feedback-track-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="feedback-normal-x" style="display: block; margin-bottom: 5px; font-weight: bold;">X 좌표 (0.0 ~ 1.0):</label>
+                    <input type="number" id="feedback-normal-x" placeholder="0.5" step="0.01" min="0" max="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="feedback-normal-y" style="display: block; margin-bottom: 5px; font-weight: bold;">Y 좌표 (0.0 ~ 1.0):</label>
+                    <input type="number" id="feedback-normal-y" placeholder="0.3" step="0.01" min="0" max="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="feedback-content" style="display: block; margin-bottom: 5px; font-weight: bold;">피드백 내용:</label>
+                    <textarea id="feedback-content" placeholder="이 부분의 색상을 더 밝게 해주세요." rows="3" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"></textarea>
+                </div>
+                
+                <button onclick="submitFeedback()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">피드백 등록</button>
+            </div>
+        </div>
+
+        <!-- 피드백 수정 탭 -->
+        <div id="feedback-edit-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method put">PUT</span>
+                    <span>/api/v1/feedback/edit</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/edit')">복사</button>
+                </div>
+                <div class="api-title">피드백 수정 (게스트용)</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    게스트(프로젝트 의뢰인)가 자신이 작성한 피드백의 내용을 수정합니다.<br>
+                    초대 코드를 통해 권한을 확인합니다.
+                </p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="edit-feedback-code" style="display: block; margin-bottom: 5px; font-weight: bold;">초대 코드 (16자리):</label>
+                    <input type="text" id="edit-feedback-code" placeholder="AbCdEfGhIjKlMnOp" maxlength="16" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="edit-feedback-id" style="display: block; margin-bottom: 5px; font-weight: bold;">피드백 ID:</label>
+                    <input type="number" id="edit-feedback-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="edit-feedback-content" style="display: block; margin-bottom: 5px; font-weight: bold;">수정할 피드백 내용:</label>
+                    <textarea id="edit-feedback-content" placeholder="이 부분의 색상을 더 어둡게 해주세요." rows="3" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"></textarea>
+                </div>
+                
+                <button onclick="editFeedback()" style="background-color: #ffc107; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">피드백 수정</button>
+            </div>
+        </div>
+
+        <!-- 피드백 목록 조회 탭 -->
+        <div id="feedback-list-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method get">GET</span>
+                    <span>/api/v1/feedback/list</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/list')">복사</button>
+                </div>
+                <div class="api-title">피드백 목록 조회 (리비전 단위)</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    게스트(프로젝트 의뢰인)가 특정 리비전의 피드백 목록을 조회합니다.<br>
+                    초대 코드를 통해 권한을 확인합니다.
+                </p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="list-feedback-code" style="display: block; margin-bottom: 5px; font-weight: bold;">초대 코드 (16자리):</label>
+                    <input type="text" id="list-feedback-code" placeholder="AbCdEfGhIjKlMnOp" maxlength="16" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="list-feedback-revision-id" style="display: block; margin-bottom: 5px; font-weight: bold;">리비전 ID:</label>
+                    <input type="number" id="list-feedback-revision-id" placeholder="9" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <button onclick="getFeedbackList()" style="background-color: #17a2b8; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">피드백 목록 조회</button>
+                
+                <div id="feedback-list-result" style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 4px; display: none;">
+                    <h4>조회 결과</h4>
+                    <div id="feedback-list-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 피드백 삭제 탭 -->
+        <div id="feedback-delete-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method delete">DELETE</span>
+                    <span>/api/v1/feedback/delete</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/delete')">복사</button>
+                </div>
+                <div class="api-title">피드백 삭제 (게스트용)</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    게스트(프로젝트 의뢰인)가 자신이 작성한 피드백을 삭제합니다.<br>
+                    초대 코드를 통해 권한을 확인합니다.
+                </p>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="delete-feedback-code" style="display: block; margin-bottom: 5px; font-weight: bold;">초대 코드 (16자리):</label>
+                    <input type="text" id="delete-feedback-code" placeholder="AbCdEfGhIjKlMnOp" maxlength="16" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="delete-feedback-id" style="display: block; margin-bottom: 5px; font-weight: bold;">피드백 ID:</label>
+                    <input type="number" id="delete-feedback-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <button onclick="deleteFeedback()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">피드백 삭제</button>
             </div>
         </div>
     </div>
@@ -1906,6 +2057,222 @@ submitRevisionWithFiles()
   .catch(error => console.error('Error:', error));`;
 
             document.getElementById('revision-submit-code').textContent = code;
+        }
+
+        // Feedback API 테스트 함수
+        async function submitFeedback() {
+            const code = document.getElementById('feedback-code').value;
+            const projectId = parseInt(document.getElementById('feedback-project-id').value);
+            const revisionId = parseInt(document.getElementById('feedback-revision-id').value);
+            const trackId = parseInt(document.getElementById('feedback-track-id').value);
+            const normalX = parseFloat(document.getElementById('feedback-normal-x').value);
+            const normalY = parseFloat(document.getElementById('feedback-normal-y').value);
+            const content = document.getElementById('feedback-content').value;
+
+            if (!code || !projectId || !revisionId || !trackId || normalX === undefined || normalY === undefined || !content) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(HOST + '/api/v1/feedback/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        projectId: projectId,
+                        revisionId: revisionId,
+                        trackId: trackId,
+                        normalX: normalX,
+                        normalY: normalY,
+                        content: content
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('피드백이 성공적으로 등록되었습니다!\n\n' + 
+                          'ID: ' + result.id + '\n' +
+                          '작성자: ' + result.authorName + '\n' +
+                          '프로젝트: ' + result.projectName + '\n' +
+                          '리비전: ' + result.revisionNo + '\n' +
+                          '트랙: ' + result.trackName + '\n' +
+                          '좌표: (' + result.normalX + ', ' + result.normalY + ')\n' +
+                          '내용: ' + result.content);
+                } else {
+                    alert('오류: ' + result.message);
+                }
+            } catch (error) {
+                alert('네트워크 오류: ' + error.message);
+            }
+        }
+
+        // 피드백 수정 함수
+        async function editFeedback() {
+            const code = document.getElementById('edit-feedback-code').value;
+            const feedbackId = parseInt(document.getElementById('edit-feedback-id').value);
+            const content = document.getElementById('edit-feedback-content').value;
+
+            if (!code || !feedbackId || !content) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(HOST + '/api/v1/feedback/edit', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        feedbackId: feedbackId,
+                        content: content
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('피드백이 성공적으로 수정되었습니다!\n\n' + 
+                          'ID: ' + result.id + '\n' +
+                          '작성자: ' + result.authorName + '\n' +
+                          '프로젝트: ' + result.projectName + '\n' +
+                          '리비전: ' + result.revisionNo + '\n' +
+                          '트랙: ' + result.trackName + '\n' +
+                          '좌표: (' + result.normalX + ', ' + result.normalY + ')\n' +
+                          '수정된 내용: ' + result.content + '\n' +
+                          '수정일시: ' + new Date(result.updatedAt).toLocaleString());
+                } else {
+                    alert('오류: ' + result.message);
+                }
+            } catch (error) {
+                alert('네트워크 오류: ' + error.message);
+            }
+        }
+
+        // 피드백 목록 조회 함수
+        async function getFeedbackList() {
+            const code = document.getElementById('list-feedback-code').value;
+            const revisionId = parseInt(document.getElementById('list-feedback-revision-id').value);
+
+            if (!code || !revisionId) {
+                alert('초대 코드와 리비전 ID는 필수입니다.');
+                return;
+            }
+
+            try {
+                // URL 파라미터 구성
+                const params = new URLSearchParams({
+                    code: code,
+                    revisionId: revisionId
+                });
+
+                const response = await fetch(HOST + '/api/v1/feedback/list?' + params.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // 결과 표시
+                    const resultDiv = document.getElementById('feedback-list-result');
+                    const contentDiv = document.getElementById('feedback-list-content');
+                    
+                    let html = `
+                        <div style="margin-bottom: 15px;">
+                            <strong>프로젝트:</strong> ${result.projectName}<br>
+                            <strong>총 피드백:</strong> ${result.totalCount}개<br>
+                            <strong>해결됨:</strong> ${result.solvedCount}개<br>
+                            <strong>미해결:</strong> ${result.unsolvedCount}개
+                        </div>
+                    `;
+
+                    if (result.feedbacks.length > 0) {
+                        html += '<div style="max-height: 400px; overflow-y: auto;">';
+                        result.feedbacks.forEach(feedback => {
+                            html += `
+                                <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 4px; background-color: white;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                        <strong>ID: ${feedback.id}</strong>
+                                        <span style="color: ${feedback.solved ? '#28a745' : '#dc3545'}; font-weight: bold;">
+                                            ${feedback.solved ? '✅ 해결됨' : '⏳ 미해결'}
+                                        </span>
+                                    </div>
+                                    <div><strong>리비전:</strong> ${feedback.revisionNo} | <strong>트랙:</strong> ${feedback.trackName}</div>
+                                    <div><strong>좌표:</strong> (${feedback.normalX}, ${feedback.normalY})</div>
+                                    <div style="margin-top: 5px;"><strong>내용:</strong> ${feedback.content}</div>
+                                    <div style="margin-top: 5px; font-size: 12px; color: #666;">
+                                        생성: ${new Date(feedback.createdAt).toLocaleString()}
+                                        ${feedback.updatedAt !== feedback.createdAt ? ' | 수정: ' + new Date(feedback.updatedAt).toLocaleString() : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                    } else {
+                        html += '<div style="text-align: center; color: #666; padding: 20px;">피드백이 없습니다.</div>';
+                    }
+
+                    contentDiv.innerHTML = html;
+                    resultDiv.style.display = 'block';
+                } else {
+                    alert('오류: ' + result.message);
+                }
+            } catch (error) {
+                alert('네트워크 오류: ' + error.message);
+            }
+        }
+
+        // 피드백 삭제 함수
+        async function deleteFeedback() {
+            const code = document.getElementById('delete-feedback-code').value;
+            const feedbackId = parseInt(document.getElementById('delete-feedback-id').value);
+
+            if (!code || !feedbackId) {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+
+            // 삭제 확인
+            if (!confirm('정말로 이 피드백을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(HOST + '/api/v1/feedback/delete', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        feedbackId: feedbackId
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('피드백이 성공적으로 삭제되었습니다!\n\n' + 
+                          '삭제된 ID: ' + result.deletedId + '\n' +
+                          '작성자: ' + result.authorName + '\n' +
+                          '프로젝트: ' + result.projectName + '\n' +
+                          '리비전: ' + result.revisionNo + '\n' +
+                          '트랙: ' + result.trackName + '\n' +
+                          '삭제된 내용: ' + result.content);
+                } else {
+                    alert('오류: ' + result.message);
+                }
+            } catch (error) {
+                alert('네트워크 오류: ' + error.message);
+            }
         }
     </script>
 </body>
