@@ -12,3 +12,4 @@ export class GetProjectHistoryDto {
   @IsNotEmpty({ message: 'projectId는 필수입니다.' })
   projectId: number;
 }
+

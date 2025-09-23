@@ -17,3 +17,4 @@ export class ReviewDoneDto {
   @IsNotEmpty({ message: 'revisionId는 필수입니다.' })
   revisionId: number;
 }
+

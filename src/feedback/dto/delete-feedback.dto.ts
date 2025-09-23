@@ -20,3 +20,4 @@ export class DeleteFeedbackDto {
   @IsNotEmpty({ message: '피드백 ID는 필수입니다.' })
   feedbackId: number;
 }
+

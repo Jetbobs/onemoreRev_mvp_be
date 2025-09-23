@@ -79,8 +79,14 @@ export class RevisionsController {
     description: '특정 리비전의 상세 정보를 조회합니다. 프로젝트 소유자만 조회할 수 있으며, 각 트랙별로 해당 리비전 또는 그 이전 리비전의 최신 파일 정보를 반환합니다.'
   })
   @ApiQuery({
-    name: 'revisionId',
-    description: '조회할 리비전 ID',
+    name: 'projectId',
+    description: '프로젝트 ID',
+    type: 'number',
+    example: 1
+  })
+  @ApiQuery({
+    name: 'revNo',
+    description: '리비전 번호',
     type: 'number',
     example: 1
   })

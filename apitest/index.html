@@ -852,8 +852,18 @@
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/revision/info')">복사</button>
                 </div>
                 
-                <label for="revision-info-id">리비전 ID:</label>
-                <input type="number" id="revision-info-id" placeholder="리비전 ID를 입력해주세요" value="1">
+                <label for="revision-info-project-id">프로젝트 ID:</label>
+                <input type="number" id="revision-info-project-id" placeholder="프로젝트 ID를 입력해주세요" value="1">
+                
+                <label for="revision-info-rev-no">리비전 번호:</label>
+                <input type="number" id="revision-info-rev-no" placeholder="리비전 번호를 입력해주세요" value="1">
+                
+                <div style="margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px; font-size: 14px;">
+                    <strong>📋 리비전 조회 기능:</strong><br>
+                    • 프로젝트 ID와 리비전 번호로 리비전 조회<br>
+                    • 프로젝트의 모든 트랙과 최신 파일 정보<br>
+                    • 프로젝트 소유자만 조회 가능
+                </div>
                 
                 <div class="code-response-container">
                     <div class="code-section">
@@ -1424,7 +1434,8 @@
             document.getElementById('track-add-name').addEventListener('input', updateTrackAddCode);
 
             // 리비전 조회 필드들
-            document.getElementById('revision-info-id').addEventListener('input', updateRevisionInfoCode);
+            document.getElementById('revision-info-project-id').addEventListener('input', updateRevisionInfoCode);
+            document.getElementById('revision-info-rev-no').addEventListener('input', updateRevisionInfoCode);
 
             // 리비전 서브밋 필드들
             document.getElementById('revision-description').addEventListener('input', updateRevisionSubmitCode);
@@ -1618,9 +1629,10 @@ fetch(host + '/api/v1/track/add', {
 
         // 리비전 조회 코드 업데이트
         function updateRevisionInfoCode() {
-            const revisionId = document.getElementById('revision-info-id').value || '1';
+            const projectId = document.getElementById('revision-info-project-id').value || '1';
+            const revNo = document.getElementById('revision-info-rev-no').value || '1';
             const code = `const host = '${HOST}';
-fetch(host + '/api/v1/revision/info?revisionId=${revisionId}', {
+fetch(host + '/api/v1/revision/info?projectId=${projectId}&revNo=${revNo}', {
   method: 'GET',
   credentials: 'include'
 })
@@ -1858,15 +1870,16 @@ fetch(host + '/api/v1/logout', {
         }
 
         async function getRevisionInfo() {
-            const revisionId = document.getElementById('revision-info-id').value;
+            const projectId = document.getElementById('revision-info-project-id').value;
+            const revNo = document.getElementById('revision-info-rev-no').value;
             
-            if (!revisionId) {
-                alert('리비전 ID를 입력해주세요.');
+            if (!projectId || !revNo) {
+                alert('프로젝트 ID와 리비전 번호를 입력해주세요.');
                 return;
             }
 
             try {
-                const response = await fetch(`${API_BASE}/revision/info?revisionId=${revisionId}`, {
+                const response = await fetch(`${API_BASE}/revision/info?projectId=${projectId}&revNo=${revNo}`, {
                     method: 'GET',
                     credentials: 'include'
                 });

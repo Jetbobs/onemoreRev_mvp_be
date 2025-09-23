@@ -18,3 +18,4 @@ export class AddFeedbackReplyDto {
   @IsNotEmpty({ message: 'reply는 필수입니다.' })
   reply: string;
 }
+

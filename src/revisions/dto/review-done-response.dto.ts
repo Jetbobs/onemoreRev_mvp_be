@@ -25,3 +25,4 @@ export class ReviewDoneResponseDto {
   @ApiProperty({ description: '리뷰 완료 일시' })
   reviewedAt: Date;
 }
+

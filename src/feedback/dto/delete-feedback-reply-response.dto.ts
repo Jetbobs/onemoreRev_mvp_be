@@ -34,3 +34,4 @@ export class DeleteFeedbackReplyResponseDto {
   @ApiProperty({ description: '답글 삭제 일시' })
   deletedAt: Date;
 }
+

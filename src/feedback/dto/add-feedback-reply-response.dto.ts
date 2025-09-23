@@ -34,3 +34,4 @@ export class AddFeedbackReplyResponseDto {
   @ApiProperty({ description: '답글 작성 일시' })
   repliedAt: Date;
 }
+

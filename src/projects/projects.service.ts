@@ -710,8 +710,11 @@ export class ProjectsService {
 
   async getRevisionInfo(getRevisionInfoDto: GetRevisionInfoDto, userId: number): Promise<RevisionInfoResponseDto> {
     // 리비전 존재 여부 및 권한 확인
-    const revision = await this.prisma.revision.findUnique({
-      where: { id: getRevisionInfoDto.revisionId },
+    const revision = await this.prisma.revision.findFirst({
+      where: { 
+        projectId: getRevisionInfoDto.projectId,
+        revNo: getRevisionInfoDto.revNo
+      },
       include: {
         project: {
           select: {
@@ -743,6 +746,7 @@ export class ProjectsService {
     if (revision.project.authorId !== userId) {
       throw new ForbiddenException('해당 리비전에 대한 권한이 없습니다.');
     }
+
 
     // 각 트랙별로 요청한 리비전 또는 그 이전 리비전의 최신 파일 조회
     const tracksWithFiles: RevisionTrackDto[] = [];
@@ -902,7 +906,7 @@ export class ProjectsService {
    */
   async reviewDone(reviewDoneDto: ReviewDoneDto): Promise<ReviewDoneResponseDto> {
     // 초대 코드로 게스트 및 프로젝트 확인
-    const invitation = await this.prisma.invitation.findUnique({
+    const invitation = await this.prisma.invitation.findFirst({
       where: { code: reviewDoneDto.code },
       include: {
         guest: {
