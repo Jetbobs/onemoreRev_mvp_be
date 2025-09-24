@@ -93,6 +93,9 @@ export class RevisionInfoResponseDto {
   @ApiProperty({ description: '해당 프로젝트의 마지막 리비전 여부' })
   isLast: boolean;
 
+  @ApiProperty({ description: '해당 프로젝트의 첫 번째 게스트 초대 코드', required: false })
+  invitationCode?: string;
+
   @ApiProperty({ description: '프로젝트의 모든 트랙 정보', type: [RevisionTrackDto] })
   tracks: RevisionTrackDto[];
 

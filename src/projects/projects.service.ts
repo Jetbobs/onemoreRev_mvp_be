@@ -833,6 +833,14 @@ export class ProjectsService {
     });
     const isLast = maxRevNo ? revision.revNo === maxRevNo.revNo : true;
 
+    // 해당 프로젝트의 첫 번째 게스트 초대 코드 조회
+    const firstInvitation = await this.prisma.invitation.findFirst({
+      where: { projectId: revision.project.id },
+      select: { code: true },
+      orderBy: { id: 'asc' }
+    });
+    const invitationCode = firstInvitation?.code;
+
     // 해당 리비전의 피드백 목록 조회
     const feedbacks = await this.prisma.feedback.findMany({
       where: { revisionId: revision.id },
@@ -873,6 +881,7 @@ export class ProjectsService {
       createdAt: revision.createdAt,
       updatedAt: revision.updatedAt,
       isLast: isLast,
+      invitationCode: invitationCode,
       tracks: tracksWithFiles,
       feedbacks: feedbacksWithDetails,
     };
