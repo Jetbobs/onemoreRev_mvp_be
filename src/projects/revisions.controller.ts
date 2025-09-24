@@ -19,8 +19,10 @@ import {
 import { Request } from 'express';
 import { ReviewDoneResponseDto } from '../revisions/dto/review-done-response.dto';
 import { ReviewDoneDto } from '../revisions/dto/review-done.dto';
+import { CreateRevisionDto } from './dto/create-revision.dto';
 import { GetRevisionInfoDto } from './dto/get-revision-info.dto';
 import { RevisionInfoResponseDto } from './dto/revision-info-response.dto';
+import { RevisionResponseDto } from './dto/revision-response.dto';
 import { SubmitRevisionResponseDto } from './dto/submit-revision-response.dto';
 import { SubmitRevisionDto } from './dto/submit-revision.dto';
 import { ProjectsService } from './projects.service';
@@ -29,6 +31,49 @@ import { ProjectsService } from './projects.service';
 @Controller('api/v1/revision')
 export class RevisionsController {
   constructor(private readonly projectsService: ProjectsService) {}
+
+  @Post('new')
+  @ApiOperation({
+    summary: '리비전 생성',
+    description: '기존 프로젝트에 새로운 리비전을 생성합니다. 프로젝트 소유자만 사용할 수 있으며, 이전 리비전의 상태가 reviewed여야 합니다.'
+  })
+  @ApiBody({
+    type: CreateRevisionDto,
+    description: '리비전 생성 정보'
+  })
+  @ApiResponse({
+    status: 201,
+    description: '리비전이 성공적으로 생성되었습니다.',
+    type: RevisionResponseDto
+  })
+  @ApiResponse({
+    status: 400,
+    description: '잘못된 요청 데이터이거나 이전 리비전의 상태가 reviewed가 아닙니다.'
+  })
+  @ApiResponse({
+    status: 401,
+    description: '로그인이 필요합니다.'
+  })
+  @ApiResponse({
+    status: 403,
+    description: '해당 프로젝트에 대한 권한이 없습니다.'
+  })
+  @ApiResponse({
+    status: 404,
+    description: '프로젝트를 찾을 수 없습니다.'
+  })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async createRevision(
+    @Body() createRevisionDto: CreateRevisionDto,
+    @Req() req: Request
+  ): Promise<RevisionResponseDto> {
+    // 세션에서 사용자 ID 확인
+    if (!req.session.userId) {
+      throw new UnauthorizedException('로그인이 필요합니다.');
+    }
+
+    return this.projectsService.createRevision(createRevisionDto, req.session.userId);
+  }
 
   @Post('submit')
   @ApiOperation({
@@ -90,6 +135,13 @@ export class RevisionsController {
     type: 'number',
     example: 1
   })
+  @ApiQuery({
+    name: 'code',
+    description: '초대 코드 (게스트용, 로그인되지 않은 경우 필수)',
+    type: 'string',
+    example: 'AbCdEfGhIjKlMnOp',
+    required: false
+  })
   @ApiResponse({
     status: 200,
     description: '리비전 정보를 성공적으로 조회했습니다.',
@@ -101,7 +153,7 @@ export class RevisionsController {
   })
   @ApiResponse({
     status: 401,
-    description: '로그인이 필요합니다.'
+    description: '로그인이 필요하거나 유효한 초대 코드를 제공해주세요.'
   })
   @ApiResponse({
     status: 403,
@@ -116,12 +168,10 @@ export class RevisionsController {
     @Query() getRevisionInfoDto: GetRevisionInfoDto,
     @Req() req: Request
   ): Promise<RevisionInfoResponseDto> {
-    // 세션에서 사용자 ID 확인
-    if (!req.session.userId) {
-      throw new UnauthorizedException('로그인이 필요합니다.');
-    }
+    // 세션에서 사용자 ID 확인 (optional)
+    const userId = req.session?.userId;
 
-    return this.projectsService.getRevisionInfo(getRevisionInfoDto, req.session.userId);
+    return this.projectsService.getRevisionInfo(getRevisionInfoDto, userId);
   }
 
   @Post('review/done')

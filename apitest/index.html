@@ -574,6 +574,7 @@
                         <button class="tab-button" onclick="showTab('revision-info')">📋 리비전조회</button>
                         <button class="tab-button" onclick="showTab('revision-submit')">📤 리비전제출</button>
                         <button class="tab-button" onclick="showTab('revision-review-done')">✅ 리뷰완료</button>
+                        <button class="tab-button" onclick="showTab('revision-new')">🆕 다음리비전생성</button>
                     </div>
                 </div>
                 
@@ -843,6 +844,43 @@
             </div>
         </div>
 
+        <!-- 다음 리비전 생성 탭 -->
+        <div id="revision-new-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/v1/revision/new</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/revision/new')">복사</button>
+                </div>
+                
+                <label for="revision-new-project-id">프로젝트 ID:</label>
+                <input type="number" id="revision-new-project-id" placeholder="프로젝트 ID를 입력해주세요" value="1">
+                
+                <div style="margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px; font-size: 14px;">
+                    <strong>🆕 다음 리비전 생성 기능:</strong><br>
+                    • 프로젝트에 새로운 리비전 생성<br>
+                    • 이전 리비전의 상태가 reviewed여야 생성 가능<br>
+                    • 프로젝트 소유자만 사용 가능 (로그인 필수)
+                </div>
+                
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('revision-new-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="revision-new-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <div class="response" id="revision-new-response" style="display: none;"></div>
+                        <div id="revision-new-status" class="status-code" style="display: none;"></div>
+                    </div>
+                </div>
+                
+                <button class="submit-button" onclick="createRevision()">Run</button>
+            </div>
+        </div>
+
         <!-- 리비전 조회 탭 -->
         <div id="revision-info-tab" class="tab-content">
             <div class="api-section">
@@ -858,11 +896,16 @@
                 <label for="revision-info-rev-no">리비전 번호:</label>
                 <input type="number" id="revision-info-rev-no" placeholder="리비전 번호를 입력해주세요" value="1">
                 
+                <label for="revision-info-code">초대 코드 (게스트용, 선택사항):</label>
+                <input type="text" id="revision-info-code" placeholder="초대 코드를 입력해주세요" maxlength="16">
+                
                 <div style="margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px; font-size: 14px;">
                     <strong>📋 리비전 조회 기능:</strong><br>
                     • 프로젝트 ID와 리비전 번호로 리비전 조회<br>
                     • 프로젝트의 모든 트랙과 최신 파일 정보<br>
-                    • 프로젝트 소유자만 조회 가능
+                    • 해당 리비전의 피드백 목록 포함<br>
+                    • 마지막 리비전 여부 (isLast) 정보 포함<br>
+                    • 프로젝트 소유자 또는 초대 코드를 가진 게스트 조회 가능
                 </div>
                 
                 <div class="code-response-container">
@@ -1433,9 +1476,13 @@
             document.getElementById('track-add-project-id').addEventListener('input', updateTrackAddCode);
             document.getElementById('track-add-name').addEventListener('input', updateTrackAddCode);
 
+            // 리비전 생성 필드들
+            document.getElementById('revision-new-project-id').addEventListener('input', updateRevisionNewCode);
+
             // 리비전 조회 필드들
             document.getElementById('revision-info-project-id').addEventListener('input', updateRevisionInfoCode);
             document.getElementById('revision-info-rev-no').addEventListener('input', updateRevisionInfoCode);
+            document.getElementById('revision-info-code').addEventListener('input', updateRevisionInfoCode);
 
             // 리비전 서브밋 필드들
             document.getElementById('revision-description').addEventListener('input', updateRevisionSubmitCode);
@@ -1627,12 +1674,40 @@ fetch(host + '/api/v1/track/add', {
             document.getElementById('track-add-code').textContent = code;
         }
 
+        // 리비전 생성 코드 업데이트
+        function updateRevisionNewCode() {
+            const projectId = document.getElementById('revision-new-project-id').value || '1';
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/revision/new', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include',
+  body: JSON.stringify({
+    projectId: ${projectId}
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('revision-new-code').textContent = code;
+        }
+
         // 리비전 조회 코드 업데이트
         function updateRevisionInfoCode() {
             const projectId = document.getElementById('revision-info-project-id').value || '1';
             const revNo = document.getElementById('revision-info-rev-no').value || '1';
+            const invitationCode = document.getElementById('revision-info-code').value;
+            
+            let url = `/api/v1/revision/info?projectId=${projectId}&revNo=${revNo}`;
+            if (invitationCode) {
+                url += `&code=${invitationCode}`;
+            }
+            
             const code = `const host = '${HOST}';
-fetch(host + '/api/v1/revision/info?projectId=${projectId}&revNo=${revNo}', {
+fetch(host + '${url}', {
   method: 'GET',
   credentials: 'include'
 })
@@ -1869,17 +1944,51 @@ fetch(host + '/api/v1/logout', {
             }
         }
 
+        async function createRevision() {
+            const projectId = document.getElementById('revision-new-project-id').value;
+            
+            if (!projectId) {
+                alert('프로젝트 ID를 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/revision/new`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        projectId: parseInt(projectId)
+                    })
+                });
+                const result = await response.json();
+                showResponse('revision-new-response', result, !response.ok);
+                showStatusCode('revision-new-status', response.status);
+            } catch (error) {
+                showResponse('revision-new-response', { error: error.message }, true);
+                showStatusCode('revision-new-status', 0); // 네트워크 오류
+            }
+        }
+
         async function getRevisionInfo() {
             const projectId = document.getElementById('revision-info-project-id').value;
             const revNo = document.getElementById('revision-info-rev-no').value;
+            const invitationCode = document.getElementById('revision-info-code').value;
             
             if (!projectId || !revNo) {
                 alert('프로젝트 ID와 리비전 번호를 입력해주세요.');
                 return;
             }
 
+            let url = `${API_BASE}/revision/info?projectId=${projectId}&revNo=${revNo}`;
+            if (invitationCode) {
+                url += `&code=${invitationCode}`;
+            }
+
             try {
-                const response = await fetch(`${API_BASE}/revision/info?projectId=${projectId}&revNo=${revNo}`, {
+                const response = await fetch(url, {
                     method: 'GET',
                     credentials: 'include'
                 });

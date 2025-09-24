@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -174,12 +174,17 @@ export class ProjectsService {
 
     // 트랜잭션으로 리비전 생성
     const revision = await this.prisma.$transaction(async (tx) => {
-      // 해당 프로젝트의 최대 rev_no 조회
+      // 해당 프로젝트의 최대 rev_no 조회 (상태도 함께 조회)
       const maxRevision = await tx.revision.findFirst({
         where: { projectId: createRevisionDto.projectId },
         orderBy: { revNo: 'desc' },
-        select: { revNo: true },
+        select: { revNo: true, status: true },
       });
+
+      // 기존 리비전이 있는 경우 상태 확인
+      if (maxRevision && maxRevision.status !== 'reviewed') {
+        throw new BadRequestException(`새 리비전을 생성할 수 없습니다. 이전 리비전(revNo: ${maxRevision.revNo})의 상태가 'reviewed'가 아닙니다. (현재 상태: ${maxRevision.status})`);
+      }
 
       // 다음 rev_no 계산 (없으면 1, 있으면 +1)
       const nextRevNo = maxRevision ? maxRevision.revNo + 1 : 1;
@@ -708,7 +713,7 @@ export class ProjectsService {
     };
   }
 
-  async getRevisionInfo(getRevisionInfoDto: GetRevisionInfoDto, userId: number): Promise<RevisionInfoResponseDto> {
+  async getRevisionInfo(getRevisionInfoDto: GetRevisionInfoDto, userId?: number): Promise<RevisionInfoResponseDto> {
     // 리비전 존재 여부 및 권한 확인
     const revision = await this.prisma.revision.findFirst({
       where: { 
@@ -743,8 +748,28 @@ export class ProjectsService {
       throw new NotFoundException('리비전을 찾을 수 없습니다.');
     }
 
-    if (revision.project.authorId !== userId) {
-      throw new ForbiddenException('해당 리비전에 대한 권한이 없습니다.');
+    // 권한 확인: 초대코드가 있으면 먼저 검사, 없으면 로그인 정보로 검사
+    if (getRevisionInfoDto.code) {
+      // 초대코드가 있는 경우: 초대코드 유효성 검사 먼저
+      const invitation = await this.prisma.invitation.findFirst({
+        where: { code: getRevisionInfoDto.code },
+        include: {
+          project: { select: { id: true } },
+          guest: { select: { id: true, name: true } },
+        },
+      });
+
+      if (!invitation) {
+        throw new NotFoundException('유효하지 않은 초대 코드입니다.');
+      }
+
+      if (invitation.project.id !== revision.project.id) {
+        throw new ForbiddenException('해당 리비전에 대한 권한이 없습니다.');
+      }
+    } else if (userId && revision.project.authorId === userId) {
+      // 초대코드가 없고 로그인된 프로젝트 소유자인 경우
+    } else {
+      throw new UnauthorizedException('로그인이 필요하거나 유효한 초대 코드를 제공해주세요.');
     }
 
 
@@ -800,6 +825,42 @@ export class ProjectsService {
       });
     }
 
+    // 해당 프로젝트의 마지막 리비전 여부 확인
+    const maxRevNo = await this.prisma.revision.findFirst({
+      where: { projectId: revision.project.id },
+      select: { revNo: true },
+      orderBy: { revNo: 'desc' }
+    });
+    const isLast = maxRevNo ? revision.revNo === maxRevNo.revNo : true;
+
+    // 해당 리비전의 피드백 목록 조회
+    const feedbacks = await this.prisma.feedback.findMany({
+      where: { revisionId: revision.id },
+      include: {
+        authorGuest: {
+          select: { name: true }
+        },
+        track: {
+          select: { name: true }
+        }
+      },
+      orderBy: { createdAt: 'asc' }
+    });
+
+    const feedbacksWithDetails = feedbacks.map(feedback => ({
+      id: feedback.id,
+      authorName: feedback.authorGuest.name,
+      trackId: feedback.trackId,
+      trackName: feedback.track.name,
+      normalX: feedback.normalX,
+      normalY: feedback.normalY,
+      content: feedback.content,
+      reply: feedback.reply || undefined,
+      solved: feedback.solved,
+      createdAt: feedback.createdAt,
+      updatedAt: feedback.updatedAt,
+    }));
+
     return {
       success: true,
       message: '리비전 정보를 성공적으로 조회했습니다.',
@@ -811,7 +872,9 @@ export class ProjectsService {
       projectName: revision.project.name,
       createdAt: revision.createdAt,
       updatedAt: revision.updatedAt,
+      isLast: isLast,
       tracks: tracksWithFiles,
+      feedbacks: feedbacksWithDetails,
     };
   }
 

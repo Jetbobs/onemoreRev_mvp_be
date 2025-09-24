@@ -1,6 +1,41 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { TrackFileDto } from './track.dto';
 
+export class RevisionFeedbackDto {
+  @ApiProperty({ description: '피드백 ID' })
+  id: number;
+
+  @ApiProperty({ description: '작성자 이름' })
+  authorName: string;
+
+  @ApiProperty({ description: '트랙 ID' })
+  trackId: number;
+
+  @ApiProperty({ description: '트랙 이름' })
+  trackName: string;
+
+  @ApiProperty({ description: '정규화된 X 좌표' })
+  normalX: number;
+
+  @ApiProperty({ description: '정규화된 Y 좌표' })
+  normalY: number;
+
+  @ApiProperty({ description: '피드백 내용' })
+  content: string;
+
+  @ApiProperty({ description: '답변 내용', required: false })
+  reply?: string;
+
+  @ApiProperty({ description: '해결 여부' })
+  solved: boolean;
+
+  @ApiProperty({ description: '생성일시' })
+  createdAt: Date;
+
+  @ApiProperty({ description: '수정일시' })
+  updatedAt: Date;
+}
+
 export class RevisionTrackDto {
   @ApiProperty({ description: '트랙 ID' })
   id: number;
@@ -55,7 +90,13 @@ export class RevisionInfoResponseDto {
   @ApiProperty({ description: '수정일시' })
   updatedAt: Date;
 
+  @ApiProperty({ description: '해당 프로젝트의 마지막 리비전 여부' })
+  isLast: boolean;
+
   @ApiProperty({ description: '프로젝트의 모든 트랙 정보', type: [RevisionTrackDto] })
   tracks: RevisionTrackDto[];
+
+  @ApiProperty({ description: '해당 리비전의 피드백 목록', type: [RevisionFeedbackDto] })
+  feedbacks: RevisionFeedbackDto[];
 }
 
