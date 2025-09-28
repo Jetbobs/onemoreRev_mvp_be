@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GuestDto } from './guest.dto';
+import { PayCheckPointResponseDto } from './pay-check-point-response.dto';
 import { TrackDto } from './track.dto';
 
 export class RevisionInfoDto {
@@ -41,6 +42,30 @@ export class ProjectInfoResponseDto {
   @ApiProperty({ description: '작성자 ID' })
   authorId: number;
 
+  @ApiProperty({ description: '프로젝트 시작일', required: false })
+  startDate?: Date;
+
+  @ApiProperty({ description: '초안 마감일', required: false })
+  draftDeadline?: Date;
+
+  @ApiProperty({ description: '프로젝트 마감일', required: false })
+  deadline?: Date;
+
+  @ApiProperty({ description: '전체 가격' })
+  totalPrice: number;
+
+  @ApiProperty({ description: '원본파일 제공 여부' })
+  originalFileProvided: boolean;
+
+  @ApiProperty({ description: '수정 횟수 제한' })
+  modLimit: number;
+
+  @ApiProperty({ description: '추가 수정 요금' })
+  additionalModFee: number;
+
+  @ApiProperty({ description: '수정 기준', required: false })
+  modCriteria?: string;
+
   @ApiProperty({ description: '생성일시' })
   createdAt: Date;
 
@@ -55,4 +80,7 @@ export class ProjectInfoResponseDto {
 
   @ApiProperty({ description: '초대된 게스트 목록', type: [GuestDto] })
   guests: GuestDto[];
+
+  @ApiProperty({ description: '지급 체크포인트 목록', type: [PayCheckPointResponseDto] })
+  payCheckPoints: PayCheckPointResponseDto[];
 }

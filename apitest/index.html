@@ -319,6 +319,32 @@
             background-color: #c82333;
         }
         
+        /* 지급 체크포인트 입력 스타일 */
+        .paycheckpoint-item {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+            align-items: center;
+        }
+        
+        .paycheckpoint-item input {
+            width: 30%;
+        }
+        
+        .paycheckpoint-item button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 8px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        
+        .paycheckpoint-item button:hover {
+            background-color: #c82333;
+        }
+        
         #guests-container button[onclick="addGuest()"] {
             background-color: #28a745;
             color: white;
@@ -564,6 +590,7 @@
                         <button class="tab-button" onclick="showTab('project-info')">📄 프로젝트조회</button>
                         <button class="tab-button" onclick="showTab('track-add')">🎵 트랙추가</button>
                         <button class="tab-button" onclick="showTab('history')">📊 히스토리</button>
+                        <button class="tab-button" onclick="showTab('paycheckpoint-paid')">💰 지급상태변경</button>
                     </div>
                 </div>
                 
@@ -726,17 +753,91 @@
 - 브랜딩 및 아이덴티티
 - 그래픽 디자인 작업</textarea>
                 </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label for="project-start-date">프로젝트 시작일:</label>
+                        <input type="date" id="project-start-date" placeholder="시작일을 선택해주세요" value="2024-01-01">
+                    </div>
+                    <div class="form-group">
+                        <label for="project-draft-deadline">초안 마감일:</label>
+                        <input type="date" id="project-draft-deadline" placeholder="초안 마감일을 선택해주세요" value="2024-02-01">
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label for="project-deadline">프로젝트 마감일:</label>
+                        <input type="date" id="project-deadline" placeholder="마감일을 선택해주세요" value="2024-03-31">
+                    </div>
+                    <div class="form-group">
+                        <label for="project-total-price">전체 가격:</label>
+                        <input type="number" id="project-total-price" value="3000000" min="0" step="0.01" placeholder="가격을 입력해주세요">
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label for="project-mod-limit">수정 횟수 제한:</label>
+                        <input type="number" id="project-mod-limit" value="0" min="0" placeholder="수정 횟수를 입력해주세요">
+                    </div>
+                    <div class="form-group">
+                        <label for="project-additional-mod-fee">추가 수정 요금:</label>
+                        <input type="number" id="project-additional-mod-fee" value="0" min="0" step="0.01" placeholder="추가 요금을 입력해주세요">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="project-original-file-provided" style="margin-right: 8px;">
+                        원본파일(PSD, AI) 제공
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="project-mod-criteria">수정 기준:</label>
+                    <textarea id="project-mod-criteria" rows="4" placeholder="수정 기준 및 조건을 입력해주세요 (선택사항)">수정 기준:
+- 로고 크기 및 색상 변경 가능
+- 텍스트 내용 수정 가능
+- 레이아웃 미세 조정 가능
+- 3회 무료 수정 후 추가 요금 발생</textarea>
+                </div>
                 <div class="form-group">
                     <label>게스트 초대 (선택사항):</label>
                     <div id="guests-container">
                         <div class="guest-item">
-                            <input type="text" placeholder="게스트 이름" class="guest-name">
-                            <input type="email" placeholder="게스트 이메일" class="guest-email">
-                            <input type="text" placeholder="게스트 전화번호" class="guest-phone">
+                            <input type="text" placeholder="게스트 이름" class="guest-name" value="김클라이언트">
+                            <input type="email" placeholder="게스트 이메일" class="guest-email" value="client@example.com">
+                            <input type="text" placeholder="게스트 전화번호" class="guest-phone" value="010-1234-5678">
                             <button type="button" onclick="removeGuest(this)">삭제</button>
                         </div>
                     </div>
                     <button type="button" onclick="addGuest()">게스트 추가</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>지급 체크포인트 (선택사항):</label>
+                    <div id="paycheckpoints-container">
+                        <div class="paycheckpoint-item">
+                            <input type="date" placeholder="지급일" class="paycheckpoint-date" value="2024-01-15">
+                            <input type="number" placeholder="금액" class="paycheckpoint-price" min="0" step="0.01" value="1000000">
+                            <input type="text" placeholder="라벨 (예: 선금, 중도금, 잔금)" class="paycheckpoint-label" value="선금">
+                            <button type="button" onclick="removePayCheckPoint(this)">삭제</button>
+                        </div>
+                        <div class="paycheckpoint-item">
+                            <input type="date" placeholder="지급일" class="paycheckpoint-date" value="2024-02-15">
+                            <input type="number" placeholder="금액" class="paycheckpoint-price" min="0" step="0.01" value="1000000">
+                            <input type="text" placeholder="라벨 (예: 선금, 중도금, 잔금)" class="paycheckpoint-label" value="중도금">
+                            <button type="button" onclick="removePayCheckPoint(this)">삭제</button>
+                        </div>
+                        <div class="paycheckpoint-item">
+                            <input type="date" placeholder="지급일" class="paycheckpoint-date" value="2024-03-15">
+                            <input type="number" placeholder="금액" class="paycheckpoint-price" min="0" step="0.01" value="1000000">
+                            <input type="text" placeholder="라벨 (예: 선금, 중도금, 잔금)" class="paycheckpoint-label" value="잔금">
+                            <button type="button" onclick="removePayCheckPoint(this)">삭제</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addPayCheckPoint()">지급 체크포인트 추가</button>
                 </div>
                 <div class="code-response-container">
                     <div class="code-section">
@@ -1298,6 +1399,48 @@
                 </div>
             </div>
         </div>
+
+        <!-- 지급상태변경 탭 -->
+        <div id="paycheckpoint-paid-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/v1/project/paycheckpoint/paid</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/project/paycheckpoint/paid')">복사</button>
+                </div>
+                <div class="api-title">지급 체크포인트 지급액수 업데이트</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    지급 체크포인트의 실제 지급액수를 업데이트합니다. 프로젝트 소유자만 사용할 수 있습니다.<br>
+                    일부 비용만 지급하는 경우도 처리 가능합니다.
+                </p>
+                
+                <div class="form-group">
+                    <label for="paycheckpoint-id">지급 체크포인트 ID:</label>
+                    <input type="number" id="paycheckpoint-id" value="1" min="1" placeholder="지급 체크포인트 ID를 입력해주세요">
+                </div>
+                
+                <div class="form-group">
+                    <label for="paycheckpoint-paid-amount">실제 지급액수:</label>
+                    <input type="number" id="paycheckpoint-paid-amount" value="0" min="0" placeholder="실제 지급된 금액을 입력해주세요">
+                </div>
+                
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('paycheckpoint-paid-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="paycheckpoint-paid-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <span class="response-label">응답 결과</span>
+                        <div id="paycheckpoint-paid-response" class="response" style="display: none;"></div>
+                        <div id="paycheckpoint-paid-status" class="status-code" style="display: none;"></div>
+                    </div>
+                </div>
+                <button class="submit-button" onclick="updatePayCheckPointPaid()">Run</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1436,6 +1579,7 @@
             updateTrackAddCode();
             updateRevisionInfoCode();
             updateLogoutCode();
+            updatePayCheckPointPaidCode();
             
             // 프로젝트 목록 로드
             loadProjects();
@@ -1460,6 +1604,23 @@
             // 프로젝트 생성 필드들
             document.getElementById('project-name').addEventListener('input', updateProjectCreateCode);
             document.getElementById('project-description').addEventListener('input', updateProjectCreateCode);
+            document.getElementById('project-start-date').addEventListener('input', updateProjectCreateCode);
+            document.getElementById('project-draft-deadline').addEventListener('input', updateProjectCreateCode);
+            document.getElementById('project-deadline').addEventListener('input', updateProjectCreateCode);
+            document.getElementById('project-total-price').addEventListener('input', updateProjectCreateCode);
+            document.getElementById('project-mod-limit').addEventListener('input', updateProjectCreateCode);
+            document.getElementById('project-additional-mod-fee').addEventListener('input', updateProjectCreateCode);
+            document.getElementById('project-original-file-provided').addEventListener('change', updateProjectCreateCode);
+            document.getElementById('project-mod-criteria').addEventListener('input', updateProjectCreateCode);
+            
+            // 지급 체크포인트 이벤트 위임
+            document.getElementById('paycheckpoints-container').addEventListener('input', function(e) {
+                if (e.target.classList.contains('paycheckpoint-date') || 
+                    e.target.classList.contains('paycheckpoint-price') || 
+                    e.target.classList.contains('paycheckpoint-label')) {
+                    updateProjectCreateCode();
+                }
+            });
             
             // 게스트 필드들에 이벤트 리스너 추가
             document.addEventListener('input', function(e) {
@@ -1487,6 +1648,10 @@
 
             // 리비전 서브밋 필드들
             document.getElementById('revision-description').addEventListener('input', updateRevisionSubmitCode);
+            
+            // 지급상태변경 필드들
+            document.getElementById('paycheckpoint-id').addEventListener('input', updatePayCheckPointPaidCode);
+            document.getElementById('paycheckpoint-paid-amount').addEventListener('input', updatePayCheckPointPaidCode);
         }
 
         // 게스트 관리 함수들
@@ -1509,6 +1674,26 @@
             updateProjectCreateCode();
         }
 
+        // 지급 체크포인트 관리 함수들
+        function addPayCheckPoint() {
+            const container = document.getElementById('paycheckpoints-container');
+            const paycheckpointItem = document.createElement('div');
+            paycheckpointItem.className = 'paycheckpoint-item';
+            paycheckpointItem.innerHTML = `
+                <input type="date" placeholder="지급일" class="paycheckpoint-date">
+                <input type="number" placeholder="금액" class="paycheckpoint-price" min="0" step="0.01">
+                <input type="text" placeholder="라벨 (예: 선금, 중도금, 잔금)" class="paycheckpoint-label">
+                <button type="button" onclick="removePayCheckPoint(this)">삭제</button>
+            `;
+            container.appendChild(paycheckpointItem);
+            updateProjectCreateCode();
+        }
+
+        function removePayCheckPoint(button) {
+            button.parentElement.remove();
+            updateProjectCreateCode();
+        }
+
         function getGuestsData() {
             const guests = [];
             const guestItems = document.querySelectorAll('.guest-item');
@@ -1524,6 +1709,27 @@
             });
             
             return guests;
+        }
+
+        function getPayCheckPointsData() {
+            const payCheckPoints = [];
+            const paycheckpointItems = document.querySelectorAll('.paycheckpoint-item');
+            
+            paycheckpointItems.forEach(item => {
+                const payDate = item.querySelector('.paycheckpoint-date').value.trim();
+                const price = item.querySelector('.paycheckpoint-price').value.trim();
+                const label = item.querySelector('.paycheckpoint-label').value.trim();
+                
+                if (payDate && price && label) {
+                    payCheckPoints.push({ 
+                        payDate: payDate + 'T00:00:00.000Z', // ISO 형식으로 변환
+                        price: parseFloat(price),
+                        label 
+                    });
+                }
+            });
+            
+            return payCheckPoints;
         }
 
         // 회원가입 코드 업데이트
@@ -1597,12 +1803,36 @@ fetch(host + '/api/v1/user/profile', {
         function updateProjectCreateCode() {
             const name = document.getElementById('project-name').value;
             const description = document.getElementById('project-description').value;
+            const startDate = document.getElementById('project-start-date').value;
+            const draftDeadline = document.getElementById('project-draft-deadline').value;
+            const deadline = document.getElementById('project-deadline').value;
+            const totalPrice = document.getElementById('project-total-price').value;
+            const modLimit = document.getElementById('project-mod-limit').value;
+            const additionalModFee = document.getElementById('project-additional-mod-fee').value;
+            const originalFileProvided = document.getElementById('project-original-file-provided').checked;
+            const modCriteria = document.getElementById('project-mod-criteria').value;
             const guests = getGuestsData();
+            const payCheckPoints = getPayCheckPointsData();
             
             let guestsString = '';
             if (guests.length > 0) {
                 guestsString = ',\n    guests: ' + JSON.stringify(guests, null, 4).replace(/\n/g, '\n    ');
             }
+            
+            let payCheckPointsString = '';
+            if (payCheckPoints.length > 0) {
+                payCheckPointsString = ',\n    payCheckPoints: ' + JSON.stringify(payCheckPoints, null, 4).replace(/\n/g, '\n    ');
+            }
+            
+            let additionalFields = '';
+            if (startDate) additionalFields += `,\n    startDate: "${startDate}"`;
+            if (draftDeadline) additionalFields += `,\n    draftDeadline: "${draftDeadline}"`;
+            if (deadline) additionalFields += `,\n    deadline: "${deadline}"`;
+            if (totalPrice && totalPrice !== '0') additionalFields += `,\n    totalPrice: ${parseFloat(totalPrice)}`;
+            if (modLimit && modLimit !== '0') additionalFields += `,\n    modLimit: ${parseInt(modLimit)}`;
+            if (additionalModFee && additionalModFee !== '0') additionalFields += `,\n    additionalModFee: ${parseFloat(additionalModFee)}`;
+            if (originalFileProvided) additionalFields += `,\n    originalFileProvided: true`;
+            if (modCriteria) additionalFields += `,\n    modCriteria: "${modCriteria}"`;
             
             const code = `const host = '${HOST}';
 fetch(host + '/api/v1/project/new', {
@@ -1613,7 +1843,7 @@ fetch(host + '/api/v1/project/new', {
   credentials: 'include',
   body: JSON.stringify({
     name: "${name}",
-    description: "${description}"${guestsString}
+    description: "${description}"${additionalFields}${guestsString}${payCheckPointsString}
   })
 })
 .then(response => response.json())
@@ -1855,6 +2085,27 @@ fetch(host + '/api/v1/logout', {
                 description: document.getElementById('project-description').value,
                 guests: getGuestsData()
             };
+
+            // 새로운 필드들 추가
+            const startDate = document.getElementById('project-start-date').value;
+            const draftDeadline = document.getElementById('project-draft-deadline').value;
+            const deadline = document.getElementById('project-deadline').value;
+            const totalPrice = document.getElementById('project-total-price').value;
+            const modLimit = document.getElementById('project-mod-limit').value;
+            const additionalModFee = document.getElementById('project-additional-mod-fee').value;
+            const originalFileProvided = document.getElementById('project-original-file-provided').checked;
+            const modCriteria = document.getElementById('project-mod-criteria').value;
+            const payCheckPoints = getPayCheckPointsData();
+
+            if (startDate) data.startDate = startDate;
+            if (draftDeadline) data.draftDeadline = draftDeadline;
+            if (deadline) data.deadline = deadline;
+            if (totalPrice && totalPrice !== '0') data.totalPrice = parseFloat(totalPrice);
+            if (modLimit && modLimit !== '0') data.modLimit = parseInt(modLimit);
+            if (additionalModFee && additionalModFee !== '0') data.additionalModFee = parseFloat(additionalModFee);
+            if (originalFileProvided) data.originalFileProvided = true;
+            if (modCriteria) data.modCriteria = modCriteria;
+            if (payCheckPoints.length > 0) data.payCheckPoints = payCheckPoints;
 
             try {
                 const response = await fetch(`${API_BASE}/project/new`, {
@@ -2791,6 +3042,62 @@ fetch(host + '/api/v1/project/history?projectId=${projectId}', {
                 showResponse('history-response', result, !response.ok);
             } catch (error) {
                 showResponse('history-response', { error: error.message }, true);
+            }
+        }
+
+        // 지급상태변경 코드 업데이트
+        function updatePayCheckPointPaidCode() {
+            const paycheckpointId = document.getElementById('paycheckpoint-id').value;
+            const paidAmount = document.getElementById('paycheckpoint-paid-amount').value;
+            
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/project/paycheckpoint/paid', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include',
+  body: JSON.stringify({
+    paycheckpointId: ${paycheckpointId},
+    paidAmount: ${paidAmount}
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('paycheckpoint-paid-code').textContent = code;
+        }
+
+        // 지급상태변경 실행
+        async function updatePayCheckPointPaid() {
+            const paycheckpointId = document.getElementById('paycheckpoint-id').value;
+            const paidAmount = document.getElementById('paycheckpoint-paid-amount').value;
+            
+            if (!paycheckpointId || paidAmount === '') {
+                alert('모든 필드를 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/project/paycheckpoint/paid`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        paycheckpointId: parseInt(paycheckpointId),
+                        paidAmount: parseInt(paidAmount)
+                    })
+                });
+                
+                const result = await response.json();
+                showResponse('paycheckpoint-paid-response', result, !response.ok);
+                showStatusCode('paycheckpoint-paid-status', response.status);
+            } catch (error) {
+                showResponse('paycheckpoint-paid-response', { error: error.message }, true);
+                showStatusCode('paycheckpoint-paid-status', 0);
             }
         }
     </script>

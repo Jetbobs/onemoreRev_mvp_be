@@ -22,6 +22,8 @@ import { GetProjectInfoDto } from './dto/get-project-info.dto';
 import { ProjectInfoResponseDto } from './dto/project-info-response.dto';
 import { ProjectListResponseDto } from './dto/project-list-response.dto';
 import { ProjectResponseDto } from './dto/project-response.dto';
+import { UpdatePayCheckPointPaidResponseDto } from './dto/update-paycheckpoint-paid-response.dto';
+import { UpdatePayCheckPointPaidDto } from './dto/update-paycheckpoint-paid.dto';
 import { ProjectsService } from './projects.service';
 
 @ApiTags('Projects')
@@ -161,5 +163,46 @@ export class ProjectsController {
       throw new UnauthorizedException('로그인이 필요합니다.');
     }
     return this.projectsService.getProjectHistory(Number(projectId), req.session.userId);
+  }
+
+  @Post('paycheckpoint/paid')
+  @ApiOperation({
+    summary: '지급 체크포인트 지급액수 업데이트',
+    description: '지급 체크포인트의 실제 지급액수를 업데이트합니다. 프로젝트 소유자만 사용할 수 있습니다.'
+  })
+  @ApiBody({
+    type: UpdatePayCheckPointPaidDto,
+    description: '지급 체크포인트 업데이트 정보'
+  })
+  @ApiResponse({
+    status: 200,
+    description: '지급 체크포인트의 지급액수가 성공적으로 업데이트되었습니다.',
+    type: UpdatePayCheckPointPaidResponseDto
+  })
+  @ApiResponse({
+    status: 400,
+    description: '잘못된 요청 데이터입니다.'
+  })
+  @ApiResponse({
+    status: 401,
+    description: '로그인이 필요합니다.'
+  })
+  @ApiResponse({
+    status: 403,
+    description: '해당 프로젝트에 대한 권한이 없습니다.'
+  })
+  @ApiResponse({
+    status: 404,
+    description: '지급 체크포인트를 찾을 수 없습니다.'
+  })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async updatePayCheckPointPaid(
+    @Body() updatePayCheckPointPaidDto: UpdatePayCheckPointPaidDto,
+    @Req() req: Request
+  ): Promise<UpdatePayCheckPointPaidResponseDto> {
+    if (!req.session.userId) {
+      throw new UnauthorizedException('로그인이 필요합니다.');
+    }
+    return this.projectsService.updatePayCheckPointPaid(updatePayCheckPointPaidDto, req.session.userId);
   }
 }

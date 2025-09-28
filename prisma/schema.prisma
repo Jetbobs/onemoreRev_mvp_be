@@ -29,19 +29,28 @@ model User {
 
 // Project 모델
 model Project {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?  @db.Text
-  authorId    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                   Int      @id @default(autoincrement())
+  name                 String
+  description          String?  @db.Text
+  authorId             Int
+  startDate            DateTime? // 프로젝트 시작일
+  draftDeadline        DateTime? // 초안 마감일
+  deadline             DateTime? // 프로젝트 마감일
+  totalPrice           Int      @default(0) // 전체 가격
+  originalFileProvided Boolean  @default(false) // 원본파일 제공여부
+  modLimit             Int      @default(0) // 수정 횟수 제한
+  additionalModFee     Int      @default(0) // 추가 수정 요금
+  modCriteria          String?  @db.Text // 수정 기준
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   // 관계
-  author      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  revisions   Revision[]
-  tracks      Track[]
-  invitations Invitation[]
-  feedbacks   Feedback[]
+  author         User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  revisions      Revision[]
+  tracks         Track[]
+  invitations    Invitation[]
+  feedbacks      Feedback[]
+  payCheckPoints PayCheckPoint[]
 
   @@map("projects")
 }
@@ -185,4 +194,23 @@ model Feedback {
   @@index([trackId])
   @@index([solved])
   @@map("feedbacks")
+}
+
+// PayCheckPoint 모델
+model PayCheckPoint {
+  id        Int      @id @default(autoincrement())
+  projectId Int
+  payDate   DateTime // 지급일
+  price     Int      // 금액
+  label     String   @db.VarChar(50) // 라벨
+  paidAmount Int     @default(0) // 실제 지급액수
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 관계
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // 인덱스
+  @@index([projectId])
+  @@map("paycheckpoints")
 }

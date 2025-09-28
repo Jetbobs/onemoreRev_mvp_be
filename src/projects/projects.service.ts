@@ -18,6 +18,8 @@ import { RevisionInfoResponseDto, RevisionTrackDto } from './dto/revision-info-r
 import { RevisionResponseDto } from './dto/revision-response.dto';
 import { FileInfoDto, SubmitRevisionResponseDto } from './dto/submit-revision-response.dto';
 import { SubmitRevisionDto } from './dto/submit-revision.dto';
+import { UpdatePayCheckPointPaidResponseDto } from './dto/update-paycheckpoint-paid-response.dto';
+import { UpdatePayCheckPointPaidDto } from './dto/update-paycheckpoint-paid.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -45,6 +47,14 @@ export class ProjectsService {
           name: createProjectDto.name,
           description: createProjectDto.description,
           authorId: userId,
+          startDate: createProjectDto.startDate ? new Date(createProjectDto.startDate) : null,
+          draftDeadline: createProjectDto.draftDeadline ? new Date(createProjectDto.draftDeadline) : null,
+          deadline: createProjectDto.deadline ? new Date(createProjectDto.deadline) : null,
+          totalPrice: createProjectDto.totalPrice || 0,
+          originalFileProvided: createProjectDto.originalFileProvided || false,
+          modLimit: createProjectDto.modLimit || 0,
+          additionalModFee: createProjectDto.additionalModFee || 0,
+          modCriteria: createProjectDto.modCriteria || null,
         },
         select: {
           id: true,
@@ -124,11 +134,38 @@ export class ProjectsService {
         }
       }
 
+      // 지급 체크포인트 생성 (payCheckPoints 목록이 있는 경우)
+      const createdPayCheckPoints = [];
+      if (createProjectDto.payCheckPoints && createProjectDto.payCheckPoints.length > 0) {
+        for (const payCheckPointData of createProjectDto.payCheckPoints) {
+          const payCheckPoint = await tx.payCheckPoint.create({
+            data: {
+              projectId: project.id,
+              payDate: new Date(payCheckPointData.payDate),
+              price: payCheckPointData.price,
+              label: payCheckPointData.label,
+              paidAmount: 0, // 기본값: 미지급
+            },
+            select: {
+              id: true,
+              payDate: true,
+              price: true,
+              label: true,
+              paidAmount: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          });
+          createdPayCheckPoints.push(payCheckPoint);
+        }
+      }
+
       return {
         project,
         revision,
         track,
         guests: createdGuests,
+        payCheckPoints: createdPayCheckPoints,
       };
     });
 
@@ -541,7 +578,21 @@ export class ProjectsService {
     // 프로젝트 존재 여부 및 소유자 확인
     const project = await this.prisma.project.findUnique({
       where: { id: getProjectInfoDto.projectId },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        authorId: true,
+        startDate: true,
+        draftDeadline: true,
+        deadline: true,
+        totalPrice: true,
+        originalFileProvided: true,
+        modLimit: true,
+        additionalModFee: true,
+        modCriteria: true,
+        createdAt: true,
+        updatedAt: true,
         revisions: {
           select: {
             id: true,
@@ -605,6 +656,20 @@ export class ProjectsService {
             createdAt: 'asc', // 초대 순서대로 정렬
           },
         },
+        payCheckPoints: {
+          select: {
+            id: true,
+            payDate: true,
+            price: true,
+            label: true,
+            paidAmount: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+          orderBy: {
+            payDate: 'asc', // 지급일 오름차순 정렬
+          },
+        },
       },
     });
 
@@ -623,6 +688,14 @@ export class ProjectsService {
       name: project.name,
       description: project.description,
       authorId: project.authorId,
+      startDate: project.startDate,
+      draftDeadline: project.draftDeadline,
+      deadline: project.deadline,
+      totalPrice: project.totalPrice,
+      originalFileProvided: project.originalFileProvided,
+      modLimit: project.modLimit,
+      additionalModFee: project.additionalModFee,
+      modCriteria: project.modCriteria,
       createdAt: project.createdAt,
       updatedAt: project.updatedAt,
       revisions: project.revisions,
@@ -644,6 +717,7 @@ export class ProjectsService {
         } : undefined,
       })),
       guests: project.invitations.map(invitation => invitation.guest),
+      payCheckPoints: project.payCheckPoints,
     };
   }
 
@@ -1050,6 +1124,62 @@ export class ProjectsService {
       projectName: revision.project.name,
       status: updatedRevision.status,
       reviewedAt: updatedRevision.updatedAt,
+    };
+  }
+
+  /**
+   * 지급 체크포인트의 지급 여부를 업데이트합니다.
+   * @param updatePayCheckPointPaidDto 지급 체크포인트 업데이트 정보
+   * @param userId 사용자 ID
+   * @returns 업데이트된 지급 체크포인트 정보
+   */
+  async updatePayCheckPointPaid(
+    updatePayCheckPointPaidDto: UpdatePayCheckPointPaidDto,
+    userId: number,
+  ): Promise<UpdatePayCheckPointPaidResponseDto> {
+    // 지급 체크포인트 존재 여부 및 프로젝트 소유자 확인
+    const paycheckpoint = await this.prisma.payCheckPoint.findUnique({
+      where: { id: updatePayCheckPointPaidDto.paycheckpointId },
+      include: {
+        project: {
+          select: {
+            id: true,
+            name: true,
+            authorId: true,
+          },
+        },
+      },
+    });
+
+    if (!paycheckpoint) {
+      throw new NotFoundException('지급 체크포인트를 찾을 수 없습니다.');
+    }
+
+    if (paycheckpoint.project.authorId !== userId) {
+      throw new ForbiddenException('해당 프로젝트에 대한 권한이 없습니다.');
+    }
+
+    // 지급액수 업데이트
+    const updatedPayCheckPoint = await this.prisma.payCheckPoint.update({
+      where: { id: updatePayCheckPointPaidDto.paycheckpointId },
+      data: {
+        paidAmount: updatePayCheckPointPaidDto.paidAmount,
+      },
+      select: {
+        id: true,
+        label: true,
+        price: true,
+        paidAmount: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: '지급 체크포인트의 지급액수가 성공적으로 업데이트되었습니다.',
+      paycheckpointId: updatedPayCheckPoint.id,
+      paidAmount: updatedPayCheckPoint.paidAmount,
+      label: updatedPayCheckPoint.label,
+      price: updatedPayCheckPoint.price,
     };
   }
 }
