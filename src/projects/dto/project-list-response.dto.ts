@@ -12,6 +12,9 @@ export class LastRevisionDto {
   @ApiProperty({ description: '리비전 설명', required: false })
   description?: string;
 
+  @ApiProperty({ description: '리비전 상태' })
+  status: string;
+
   @ApiProperty({ description: '생성일시' })
   createdAt: Date;
 }
@@ -28,6 +31,18 @@ export class ProjectListItemDto {
 
   @ApiProperty({ description: '작성자 ID' })
   authorId: number;
+
+  @ApiProperty({ description: '프로젝트 시작일', required: false })
+  startDate?: Date;
+
+  @ApiProperty({ description: '프로젝트 마감일', required: false })
+  deadline?: Date;
+
+  @ApiProperty({ description: '전체 가격' })
+  totalPrice: number;
+
+  @ApiProperty({ description: '수정 횟수 제한' })
+  modLimit: number;
 
   @ApiProperty({ description: '생성일시' })
   createdAt: Date;

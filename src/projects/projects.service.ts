@@ -266,6 +266,10 @@ export class ProjectsService {
         name: true,
         description: true,
         authorId: true,
+        startDate: true,
+        deadline: true,
+        totalPrice: true,
+        modLimit: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -278,6 +282,7 @@ export class ProjectsService {
             id: true,
             revNo: true,
             description: true,
+            status: true,
             createdAt: true,
           },
           orderBy: {
@@ -347,6 +352,7 @@ export class ProjectsService {
             id: project.revisions[0].id,
             revNo: project.revisions[0].revNo,
             description: project.revisions[0].description,
+            status: project.revisions[0].status,
             createdAt: project.revisions[0].createdAt,
           }
         : undefined;
@@ -356,6 +362,10 @@ export class ProjectsService {
         name: project.name,
         description: project.description,
         authorId: project.authorId,
+        startDate: project.startDate,
+        deadline: project.deadline,
+        totalPrice: project.totalPrice,
+        modLimit: project.modLimit,
         createdAt: project.createdAt,
         updatedAt: project.updatedAt,
         revisionCount: project._count.revisions,
