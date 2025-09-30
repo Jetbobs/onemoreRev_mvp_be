@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { AuthorDto } from './author.dto';
 import { GuestDto } from './guest.dto';
 import { TrackDto } from './track.dto';
 
@@ -29,8 +30,8 @@ export class ProjectListItemDto {
   @ApiProperty({ description: '프로젝트 설명', required: false })
   description?: string;
 
-  @ApiProperty({ description: '작성자 ID' })
-  authorId: number;
+  @ApiProperty({ description: '작성자 정보', type: AuthorDto })
+  author: AuthorDto;
 
   @ApiProperty({ description: '프로젝트 시작일', required: false })
   startDate?: Date;
