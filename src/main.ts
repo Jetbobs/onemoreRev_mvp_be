@@ -3,6 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import * as session from 'express-session';
+import * as fs from 'fs';
+import * as path from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -10,6 +12,19 @@ async function bootstrap() {
   (BigInt.prototype as any).toJSON = function() {
     return this.toString();
   };
+
+  // temp 디렉토리 생성 (이미지 변환용)
+  try {
+    const tempDir = path.join(process.cwd(), 'temp');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+      console.log('📁 temp 디렉토리가 생성되었습니다.');
+    } else {
+      console.log('📁 temp 디렉토리가 이미 존재합니다.');
+    }
+  } catch (error) {
+    console.warn('⚠️ temp 디렉토리 생성 중 오류:', error.message);
+  }
 
   const app = await NestFactory.create(AppModule);
 
