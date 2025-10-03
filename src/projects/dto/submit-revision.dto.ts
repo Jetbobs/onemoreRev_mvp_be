@@ -51,6 +51,16 @@ export class UploadMetadataDto {
   @ValidateNested()
   @Type(() => FileDataDto)
   file: FileDataDto;
+
+  @ApiProperty({
+    description: '소스 파일 정보 (PSD/AI 파일)',
+    type: FileDataDto,
+    required: false
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => FileDataDto)
+  srcFile?: FileDataDto;
 }
 
 export class SubmitRevisionDto {

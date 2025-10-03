@@ -57,6 +57,9 @@ export class RevisionTrackDto {
 
   @ApiProperty({ description: '해당 리비전 또는 그 이전 리비전의 최신 파일 정보', type: TrackFileDto, required: false })
   latestFile?: TrackFileDto;
+
+  @ApiProperty({ description: '소스 파일 정보 (PSD/AI 파일, 프로젝트 소유자만)', type: TrackFileDto, required: false })
+  srcFile?: TrackFileDto;
 }
 
 export class RevisionInfoResponseDto {

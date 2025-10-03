@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { FeedbackModule } from './feedback/feedback.module';
+import { FilesModule } from './files/files.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ToolModule } from './tool/tool.module';
@@ -29,6 +30,7 @@ import { ToolModule } from './tool/tool.module';
     ProjectsModule,
     FeedbackModule,
     ToolModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

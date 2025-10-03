@@ -55,6 +55,9 @@ export class ProjectHistoryRevisionDto {
 
   @ApiProperty({ type: [ProjectHistoryFileDto], description: '리비전에서 업로드된 파일 목록' })
   files: ProjectHistoryFileDto[];
+
+  @ApiProperty({ type: [ProjectHistoryFileDto], description: '리비전에서 업로드된 소스 파일 목록' })
+  srcFiles: ProjectHistoryFileDto[];
 }
 
 export class ProjectHistoryResponseDto {

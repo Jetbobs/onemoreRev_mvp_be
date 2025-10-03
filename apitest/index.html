@@ -1659,6 +1659,7 @@
             }
         }
 
+
         // 페이지 로드 시 초기 코드 생성
         document.addEventListener('DOMContentLoaded', function() {
             updateSignupCode();
@@ -2719,8 +2720,8 @@ fetch(host + '/api/v1/logout', {
                 
                 // 변환된 파일인지 확인
                 if (file.convertedData) {
-                    // 변환된 파일의 경우 변환된 데이터 사용
-                    uploads.push({
+                    // 변환된 파일의 경우 변환된 데이터와 원본 파일 모두 전송
+                    const uploadData = {
                         trackId: trackId,
                         file: {
                             original_filename: file.name, // 이미 변환된 파일명으로 저장됨
@@ -2728,7 +2729,20 @@ fetch(host + '/api/v1/logout', {
                             modified_datetime: new Date(file.lastModified).toISOString(),
                             data: file.convertedData.split(',')[1] // data:image/png;base64, 부분 제거
                         }
-                    });
+                    };
+
+                    // 원본 파일이 있으면 srcFile로 추가
+                    if (file.originalFile) {
+                        const originalBase64 = await fileToBase64(file.originalFile);
+                        uploadData.srcFile = {
+                            original_filename: file.originalFile.name,
+                            size: file.originalFile.size,
+                            modified_datetime: new Date(file.originalFile.lastModified).toISOString(),
+                            data: originalBase64
+                        };
+                    }
+
+                    uploads.push(uploadData);
                 } else {
                     // 일반 파일의 경우 기존 방식
                     const base64 = await fileToBase64(file);

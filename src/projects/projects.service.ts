@@ -315,6 +315,7 @@ export class ProjectsService {
                 mimeType: true,
                 uploadedAt: true,
                 revisionId: true,
+                src: true,
                 revision: {
                   select: {
                     revNo: true,
@@ -324,7 +325,6 @@ export class ProjectsService {
               orderBy: {
                 revisionId: 'desc', // 최신 리비전의 파일이 먼저
               },
-              take: 1, // 각 트랙당 최신 파일 1개만
             },
           },
           orderBy: {
@@ -383,23 +383,40 @@ export class ProjectsService {
         updatedAt: project.updatedAt,
         revisionCount: project._count.revisions,
         lastRevision,
-        tracks: project.tracks.map(track => ({
-          id: track.id,
-          name: track.name,
-          createdRevNo: track.createdRevNo,
-          createdRevId: track.createdRevId,
-          createdAt: track.createdAt,
-          updatedAt: track.updatedAt,
-          latestFile: track.files.length > 0 ? {
-            id: track.files[0].id,
-            originalFilename: track.files[0].originalFilename,
-            storedFilename: track.files[0].storedFilename,
-            fileSize: Number(track.files[0].fileSize),
-            mimeType: track.files[0].mimeType,
-            uploadedAt: track.files[0].uploadedAt,
-            revNo: track.files[0].revision.revNo,
-          } : undefined,
-        })), // 프로젝트에 귀속된 모든 트랙들 (최신 파일 정보 포함)
+        tracks: project.tracks.map(track => {
+          // 최신 일반 파일 찾기 (src=false인 파일 중 첫 번째)
+          const latestFile = track.files.find(f => !f.src);
+          
+          // 최신 소스 파일 찾기 (src=true인 파일 중 첫 번째)
+          const latestSrcFile = track.files.find(f => f.src);
+          
+          return {
+            id: track.id,
+            name: track.name,
+            createdRevNo: track.createdRevNo,
+            createdRevId: track.createdRevId,
+            createdAt: track.createdAt,
+            updatedAt: track.updatedAt,
+            latestFile: latestFile ? {
+              id: latestFile.id,
+              originalFilename: latestFile.originalFilename,
+              storedFilename: latestFile.storedFilename,
+              fileSize: Number(latestFile.fileSize),
+              mimeType: latestFile.mimeType,
+              uploadedAt: latestFile.uploadedAt,
+              revNo: latestFile.revision.revNo,
+            } : undefined,
+            latestSrcFile: latestSrcFile ? {
+              id: latestSrcFile.id,
+              originalFilename: latestSrcFile.originalFilename,
+              storedFilename: latestSrcFile.storedFilename,
+              fileSize: Number(latestSrcFile.fileSize),
+              mimeType: latestSrcFile.mimeType,
+              uploadedAt: latestSrcFile.uploadedAt,
+              revNo: latestSrcFile.revision.revNo,
+            } : undefined,
+          };
+        }), // 프로젝트에 귀속된 모든 트랙들 (최신 파일 정보 포함)
         guests: project.invitations.map(invitation => invitation.guest), // 프로젝트에 초대된 모든 게스트들
       };
     });
@@ -502,7 +519,7 @@ export class ProjectsService {
         // MIME 타입 추정 (간단한 확장자 기반)
         const mimeType = this.getMimeType(fileExtension);
         
-        // 데이터베이스에 파일 정보 저장
+        // 데이터베이스에 파일 정보 저장 (일반 파일, src=false)
         const savedFile = await tx.file.create({
           data: {
             revisionId: submitRevisionDto.revisionId,
@@ -513,6 +530,7 @@ export class ProjectsService {
             fileSize: BigInt(fileData.size),
             mimeType: mimeType,
             modifiedDatetime: new Date(fileData.modified_datetime),
+            src: false, // 일반 파일
           },
           select: {
             id: true,
@@ -534,6 +552,40 @@ export class ProjectsService {
           mimeType: savedFile.mimeType,
           uploadedAt: savedFile.uploadedAt,
         });
+
+        // srcFile이 있는 경우 소스 파일도 저장
+        if (upload.srcFile) {
+          const srcFileData = upload.srcFile;
+          
+          // Base64 디코딩
+          const srcFileBuffer = Buffer.from(srcFileData.data, 'base64');
+          
+          // 파일명 생성 (UUID + 원본 확장자)
+          const srcFileExtension = path.extname(srcFileData.original_filename);
+          const srcStoredFilename = `${crypto.randomUUID()}${srcFileExtension}`;
+          const srcFilePath = path.join(filesDir, srcStoredFilename);
+          
+          // 파일 저장
+          fs.writeFileSync(srcFilePath, srcFileBuffer);
+          
+          // MIME 타입 추정
+          const srcMimeType = this.getMimeType(srcFileExtension);
+          
+          // 데이터베이스에 소스 파일 정보 저장 (src=true)
+          await tx.file.create({
+            data: {
+              revisionId: submitRevisionDto.revisionId,
+              trackId: upload.trackId,
+              originalFilename: srcFileData.original_filename,
+              storedFilename: srcStoredFilename,
+              filePath: srcFilePath,
+              fileSize: BigInt(srcFileData.size),
+              mimeType: srcMimeType,
+              modifiedDatetime: new Date(srcFileData.modified_datetime),
+              src: true, // 소스 파일
+            },
+          });
+        }
       }
 
       // 리비전 상태 업데이트
@@ -654,6 +706,7 @@ export class ProjectsService {
                 mimeType: true,
                 uploadedAt: true,
                 revisionId: true,
+                src: true,
                 revision: {
                   select: {
                     revNo: true,
@@ -663,7 +716,6 @@ export class ProjectsService {
               orderBy: {
                 revisionId: 'desc', // 최신 리비전의 파일이 먼저
               },
-              take: 1, // 각 트랙당 최신 파일 1개만
             },
           },
           orderBy: {
@@ -735,23 +787,40 @@ export class ProjectsService {
       createdAt: project.createdAt,
       updatedAt: project.updatedAt,
       revisions: project.revisions,
-      tracks: project.tracks.map(track => ({
-        id: track.id,
-        name: track.name,
-        createdRevNo: track.createdRevNo,
-        createdRevId: track.createdRevId,
-        createdAt: track.createdAt,
-        updatedAt: track.updatedAt,
-        latestFile: track.files.length > 0 ? {
-          id: track.files[0].id,
-          originalFilename: track.files[0].originalFilename,
-          storedFilename: track.files[0].storedFilename,
-          fileSize: Number(track.files[0].fileSize),
-          mimeType: track.files[0].mimeType,
-          uploadedAt: track.files[0].uploadedAt,
-          revNo: track.files[0].revision.revNo,
-        } : undefined,
-      })),
+      tracks: project.tracks.map(track => {
+        // 최신 일반 파일 찾기 (src=false인 파일 중 첫 번째)
+        const latestFile = track.files.find(f => !f.src);
+        
+        // 최신 소스 파일 찾기 (src=true인 파일 중 첫 번째)
+        const latestSrcFile = track.files.find(f => f.src);
+        
+        return {
+          id: track.id,
+          name: track.name,
+          createdRevNo: track.createdRevNo,
+          createdRevId: track.createdRevId,
+          createdAt: track.createdAt,
+          updatedAt: track.updatedAt,
+          latestFile: latestFile ? {
+            id: latestFile.id,
+            originalFilename: latestFile.originalFilename,
+            storedFilename: latestFile.storedFilename,
+            fileSize: Number(latestFile.fileSize),
+            mimeType: latestFile.mimeType,
+            uploadedAt: latestFile.uploadedAt,
+            revNo: latestFile.revision.revNo,
+          } : undefined,
+          latestSrcFile: latestSrcFile ? {
+            id: latestSrcFile.id,
+            originalFilename: latestSrcFile.originalFilename,
+            storedFilename: latestSrcFile.storedFilename,
+            fileSize: Number(latestSrcFile.fileSize),
+            mimeType: latestSrcFile.mimeType,
+            uploadedAt: latestSrcFile.uploadedAt,
+            revNo: latestSrcFile.revision.revNo,
+          } : undefined,
+        };
+      }),
       guests: project.invitations.map(invitation => invitation.guest),
       payCheckPoints: project.payCheckPoints,
     };
@@ -859,6 +928,7 @@ export class ProjectsService {
     }
 
     // 권한 확인: 초대코드가 있으면 먼저 검사, 없으면 로그인 정보로 검사
+    let isProjectOwner = false;
     if (getRevisionInfoDto.code) {
       // 초대코드가 있는 경우: 초대코드 유효성 검사 먼저
       const invitation = await this.prisma.invitation.findFirst({
@@ -878,6 +948,7 @@ export class ProjectsService {
       }
     } else if (userId && revision.project.authorId === userId) {
       // 초대코드가 없고 로그인된 프로젝트 소유자인 경우
+      isProjectOwner = true;
     } else {
       throw new UnauthorizedException('로그인이 필요하거나 유효한 초대 코드를 제공해주세요.');
     }
@@ -887,7 +958,7 @@ export class ProjectsService {
     const tracksWithFiles: RevisionTrackDto[] = [];
     
     for (const track of revision.project.tracks) {
-      // 해당 트랙에서 요청한 리비전 번호 이하의 최신 파일 조회
+      // 해당 트랙에서 요청한 리비전 번호 이하의 최신 파일 조회 (일반 파일만)
       const latestFile = await this.prisma.file.findFirst({
         where: {
           trackId: track.id,
@@ -896,6 +967,7 @@ export class ProjectsService {
               lte: revision.revNo, // 요청한 리비전 번호 이하
             },
           },
+          src: false, // 일반 파일만 (렌더링된 이미지)
         },
         select: {
           id: true,
@@ -917,6 +989,29 @@ export class ProjectsService {
         ],
       });
 
+      // 프로젝트 소유자인 경우 해당 리비전에서 업로드한 소스 파일 조회
+      let srcFile = undefined;
+      if (isProjectOwner) {
+        srcFile = await this.prisma.file.findFirst({
+          where: {
+            trackId: track.id,
+            revisionId: revision.id, // 해당 리비전에서 업로드한 파일만
+            src: true, // 소스 파일만
+          },
+          select: {
+            id: true,
+            originalFilename: true,
+            storedFilename: true,
+            fileSize: true,
+            mimeType: true,
+            uploadedAt: true,
+          },
+          orderBy: {
+            uploadedAt: 'desc', // 같은 리비전 내에서는 업로드 시간 내림차순
+          },
+        });
+      }
+
       tracksWithFiles.push({
         id: track.id,
         name: track.name,
@@ -931,6 +1026,14 @@ export class ProjectsService {
           fileSize: Number(latestFile.fileSize),
           mimeType: latestFile.mimeType,
           uploadedAt: latestFile.uploadedAt,
+        } : undefined,
+        srcFile: srcFile ? {
+          id: srcFile.id,
+          originalFilename: srcFile.originalFilename,
+          storedFilename: srcFile.storedFilename,
+          fileSize: Number(srcFile.fileSize),
+          mimeType: srcFile.mimeType,
+          uploadedAt: srcFile.uploadedAt,
         } : undefined,
       });
     }
@@ -1036,6 +1139,7 @@ export class ProjectsService {
             fileSize: true,
             mimeType: true,
             uploadedAt: true,
+            src: true,
           },
           orderBy: { uploadedAt: 'asc' },
         },
@@ -1061,7 +1165,16 @@ export class ProjectsService {
       createdTracks: createdTracks
         .filter((t) => t.createdRevId === rev.id)
         .map((t) => ({ id: t.id, name: t.name })),
-      files: rev.files.map((f) => ({
+      files: rev.files.filter(f => !f.src).map((f) => ({
+        id: f.id,
+        trackId: f.trackId,
+        originalFilename: f.originalFilename,
+        storedFilename: f.storedFilename,
+        fileSize: Number(f.fileSize),
+        mimeType: f.mimeType,
+        uploadedAt: f.uploadedAt,
+      })),
+      srcFiles: rev.files.filter(f => f.src).map((f) => ({
         id: f.id,
         trackId: f.trackId,
         originalFilename: f.originalFilename,

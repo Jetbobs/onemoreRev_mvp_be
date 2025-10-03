@@ -153,6 +153,7 @@ model File {
   mimeType          String   @db.VarChar(100) // MIME 타입
   modifiedDatetime  DateTime // 파일 최종 수정일시
   uploadedAt        DateTime @default(now()) // 업로드 일시
+  src               Boolean  @default(false) // 소스 파일 여부 (PSD/AI)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -163,6 +164,7 @@ model File {
   // 인덱스
   @@index([revisionId])
   @@index([trackId])
+  @@index([src])
   @@map("files")
 }
 

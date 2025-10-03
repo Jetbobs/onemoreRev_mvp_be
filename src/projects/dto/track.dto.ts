@@ -41,4 +41,7 @@ export class TrackDto {
 
   @ApiProperty({ description: '최신 첨부파일 정보', type: TrackFileDto, required: false })
   latestFile?: TrackFileDto;
+
+  @ApiProperty({ description: '최신 소스파일 정보 (PSD/AI 파일, 프로젝트 소유자만)', type: TrackFileDto, required: false })
+  latestSrcFile?: TrackFileDto;
 }
