@@ -1504,7 +1504,7 @@
                         <p style="margin: 8px 0 0 0; color: #999; font-size: 10px;">
                             지원 형식: .psd, .ai
                         </p>
-                        <input type="file" id="convert-file-input" accept=".psd,.ai" style="display: none;" onchange="handleFileSelect(event)">
+                        <input type="file" id="convert-file-input" accept=".psd,.ai" style="display: none;" onchange="handleConvertFileSelect(event)">
                         
                         <!-- 로딩 애니메이션 -->
                         <div id="convert-loading" style="display: none; margin-top: 15px;">
@@ -3195,7 +3195,7 @@ fetch(host + '/api/v1/project/paycheckpoint/paid', {
         // 이미지 변환 관련 함수들
         let selectedFile = null;
 
-        function handleFileSelect(event) {
+        function handleConvertFileSelect(event) {
             const file = event.target.files[0];
             if (file) {
                 selectedFile = file;
