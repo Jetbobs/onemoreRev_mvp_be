@@ -69,6 +69,12 @@
         .http-method.delete {
             background-color: #f93e3e;
         }
+
+        /* 로딩 애니메이션 */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .form-group {
             margin-bottom: 15px;
         }
@@ -395,20 +401,21 @@
         
         .tab-buttons {
             display: inline-flex !important;
-            gap: 2.5px !important;
+            gap: 1px !important;
             flex-wrap: nowrap; /* 줄바꿈 방지 */
             flex: 1 1 auto;
         }
         .tab-button {
             background-color: #f8f9fa;
             border: 1px solid #ddd;
-            padding: 5px 10px;
-            border-radius: 5px;
+            padding: 3px 6px;
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 9.8px;
+            font-size: 8.5px;
             color: #333;
             transition: all 0.3s ease;
             margin: 0 !important;
+            line-height: 1.1;
         }
         .tab-button:hover {
             background-color: #e9ecef;
@@ -622,6 +629,14 @@
                     <div class="tab-buttons">
                         <button class="tab-button" onclick="showTab('feedback-reply-set')">💬 답글설정</button>
                         <button class="tab-button" onclick="showTab('feedback-reply-delete')">🗑️ 답글삭제</button>
+                    </div>
+                </div>
+                
+                <!-- 도구 그룹 -->
+                <div class="tab-group">
+                    <div class="tab-group-title">도구</div>
+                    <div class="tab-buttons">
+                        <button class="tab-button" onclick="showTab('convert-img')">🖼️ 이미지변환</button>
                     </div>
                 </div>
             </div>
@@ -1439,6 +1454,82 @@
                     </div>
                 </div>
                 <button class="submit-button" onclick="updatePayCheckPointPaid()">Run</button>
+            </div>
+        </div>
+
+        <!-- 이미지변환 탭 -->
+        <div id="convert-img-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method post">POST</span>
+                    <span>/api/tool/convert_img</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/tool/convert_img')">복사</button>
+                </div>
+                
+                <p style="margin: 8px 0 15px 0; color: #666; font-size: 9px; line-height: 1.3;">
+                    <strong>백엔드 서버 실행할 컴퓨터에 다음 도구들을 사전 설치하시고 cmd와 백엔드 재실행하셔야 합니다:</strong> ImageMagick (<a href="https://imagemagick.org/script/download.php" target="_blank" style="color: #007bff; text-decoration: none;">다운로드</a>) | 
+                    GhostScript (<a href="https://ghostscript.com/releases/gsdnld.html" target="_blank" style="color: #007bff; text-decoration: none;">다운로드</a>)
+                </p>
+                
+                <div class="form-group">
+                    <label for="convert-output-format" style="font-size: 12px;">출력 형식:</label>
+                    <select id="convert-output-format" style="width: 80px; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;">
+                        <option value="png">PNG</option>
+                        <option value="jpg">JPG</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="font-size: 12px; display: flex; align-items: center; width: fit-content;">
+                        <input type="checkbox" id="convert-keep-temp-files" style="margin-right: 5px;">
+                        임시 파일 유지
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label style="font-size: 12px;">파일 업로드:</label>
+                    <div id="convert-dropzone" style="
+                        border: 2px dashed #ccc;
+                        border-radius: 6px;
+                        padding: 20px;
+                        text-align: center;
+                        background-color: #f9f9f9;
+                        cursor: pointer;
+                        transition: border-color 0.3s;
+                        position: relative;
+                    " onclick="document.getElementById('convert-file-input').click()">
+                        <p style="margin: 0; color: #666; font-size: 13px;">
+                            PSD 또는 AI 파일을 드래그하거나 클릭하여 선택하세요
+                        </p>
+                        <p style="margin: 8px 0 0 0; color: #999; font-size: 10px;">
+                            지원 형식: .psd, .ai
+                        </p>
+                        <input type="file" id="convert-file-input" accept=".psd,.ai" style="display: none;" onchange="handleFileSelect(event)">
+                        
+                        <!-- 로딩 애니메이션 -->
+                        <div id="convert-loading" style="display: none; margin-top: 15px;">
+                            <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <p style="margin: 8px 0 0 0; color: #007bff; font-size: 12px;">이미지를 컨버팅 중입니다...</p>
+                        </div>
+                        
+                        <img id="convert-result-image" style="max-width: 100%; max-height: 300px; margin-top: 15px; display: none; margin-left: auto; margin-right: auto; border: 1px solid #e0e0e0; border-radius: 4px;" alt="변환 결과">
+                    </div>
+                </div>
+                
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('convert-img-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="convert-img-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <span class="response-label">응답 결과</span>
+                        <div id="convert-img-response" class="response" style="display: none;"></div>
+                        <div id="convert-img-status" class="status-code" style="display: none;"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -3100,6 +3191,181 @@ fetch(host + '/api/v1/project/paycheckpoint/paid', {
                 showStatusCode('paycheckpoint-paid-status', 0);
             }
         }
+
+        // 이미지 변환 관련 함수들
+        let selectedFile = null;
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                updateConvertImgCode();
+                convertImage();
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('convert-loading').style.display = 'block';
+            document.getElementById('convert-result-image').style.display = 'none';
+            document.getElementById('convert-img-response').style.display = 'none';
+            document.getElementById('convert-img-status').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('convert-loading').style.display = 'none';
+        }
+
+        // 드래그 앤 드롭 이벤트 리스너
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropzone = document.getElementById('convert-dropzone');
+            
+            if (dropzone) {
+                dropzone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    dropzone.style.borderColor = '#007bff';
+                    dropzone.style.backgroundColor = '#f0f8ff';
+                });
+                
+                dropzone.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    dropzone.style.borderColor = '#ccc';
+                    dropzone.style.backgroundColor = '#f9f9f9';
+                });
+                
+                dropzone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    dropzone.style.borderColor = '#ccc';
+                    dropzone.style.backgroundColor = '#f9f9f9';
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const file = files[0];
+                        if (file.name.toLowerCase().endsWith('.psd') || file.name.toLowerCase().endsWith('.ai')) {
+                            selectedFile = file;
+                            updateConvertImgCode();
+                            convertImage();
+                        } else {
+                            alert('PSD 또는 AI 파일만 업로드 가능합니다.');
+                        }
+                    }
+                });
+            }
+        });
+
+        function updateConvertImgCode() {
+            if (!selectedFile) {
+                document.getElementById('convert-img-code').textContent = '파일을 선택해주세요.';
+                return;
+            }
+            
+            const outputFormat = document.getElementById('convert-output-format').value;
+            
+            const code = `// 파일을 base64로 변환 후 API 호출
+const file = document.getElementById('file-input').files[0];
+const reader = new FileReader();
+reader.onload = function(e) {
+    const base64Content = e.target.result;
+    
+    fetch('${HOST}/api/tool/convert_img', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            fileContent: base64Content,
+            outputFormat: '${outputFormat}',
+            keepTempFiles: '0'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        // 변환된 이미지 표시
+        if (data.success && data.fileContent) {
+            const img = document.getElementById('result-image');
+            img.src = data.fileContent;
+            img.style.display = 'block';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+};
+reader.readAsDataURL(file);`;
+            
+            document.getElementById('convert-img-code').textContent = code;
+        }
+
+        function convertImage() {
+            if (!selectedFile) {
+                alert('파일을 선택해주세요.');
+                return;
+            }
+            
+            // 로딩 시작
+            showLoading();
+            
+            const outputFormat = document.getElementById('convert-output-format').value;
+            const keepTempFiles = document.getElementById('convert-keep-temp-files').checked ? '1' : '0';
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Content = e.target.result;
+                
+                fetch(`${HOST}/api/tool/convert_img`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        fileContent: base64Content,
+                        outputFormat: outputFormat,
+                        keepTempFiles: keepTempFiles
+                    })
+                })
+                .then(response => {
+                    document.getElementById('convert-img-status').textContent = `Status: ${response.status}`;
+                    return response.json();
+                })
+                .then(data => {
+                    // 로딩 종료
+                    hideLoading();
+                    
+                    document.getElementById('convert-img-response').textContent = JSON.stringify(data, null, 2);
+                    document.getElementById('convert-img-response').style.display = 'block';
+                    document.getElementById('convert-img-status').style.display = 'block';
+                    
+                    // 변환된 이미지 표시
+                    if (data.success && data.fileContent) {
+                        const img = document.getElementById('convert-result-image');
+                        img.src = data.fileContent;
+                        img.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    // 로딩 종료
+                    hideLoading();
+                    
+                    console.error('Error:', error);
+                    document.getElementById('convert-img-response').textContent = `Error: ${error.message}`;
+                    document.getElementById('convert-img-response').style.display = 'block';
+                    document.getElementById('convert-img-status').style.display = 'block';
+                });
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+
+        // 출력 형식 변경 시 코드 업데이트
+        document.addEventListener('DOMContentLoaded', function() {
+            const outputFormatSelect = document.getElementById('convert-output-format');
+            if (outputFormatSelect) {
+                outputFormatSelect.addEventListener('change', function() {
+                    if (selectedFile) {
+                        updateConvertImgCode();
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

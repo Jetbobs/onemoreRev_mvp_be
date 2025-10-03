@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProjectsModule } from './projects/projects.module';
+import { ToolModule } from './tool/tool.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ProjectsModule } from './projects/projects.module';
     AuthModule,
     ProjectsModule,
     FeedbackModule,
+    ToolModule,
   ],
   controllers: [AppController],
   providers: [AppService],
