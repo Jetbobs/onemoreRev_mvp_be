@@ -1,4 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ActivityLogService } from '../common/services/activity-log.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddFeedbackReplyResponseDto } from './dto/add-feedback-reply-response.dto';
 import { AddFeedbackReplyDto } from './dto/add-feedback-reply.dto';
@@ -15,7 +16,10 @@ import { GetFeedbackListDto } from './dto/get-feedback-list.dto';
 
 @Injectable()
 export class FeedbackService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private activityLogService: ActivityLogService,
+  ) {}
 
   /**
    * 피드백 생성
@@ -114,6 +118,30 @@ export class FeedbackService {
       },
     });
 
+    // 게스트 feedback 추가 로그 기록
+    const contentPreview = feedback.content.length > 50 
+      ? feedback.content.substring(0, 50) + '...' 
+      : feedback.content;
+    
+    await this.activityLogService.createLog(
+      null, // 게스트는 userId가 없음
+      createFeedbackDto.projectId,
+      `게스트가 피드백을 추가하였습니다. (게스트명: ${invitation.guest.name}, 피드백 ID: ${feedback.id}, 피드백 내용: "${contentPreview}")`,
+      {
+        feedbackId: feedback.id,
+        guestId: invitation.guest.id,
+        guestName: invitation.guest.name,
+        projectId: createFeedbackDto.projectId,
+        revisionId: createFeedbackDto.revisionId,
+        revisionNo: revision.revNo,
+        trackId: createFeedbackDto.trackId,
+        trackName: track.name,
+        normalX: feedback.normalX,
+        normalY: feedback.normalY,
+        content: feedback.content,
+      }
+    );
+
     return {
       success: true,
       message: '피드백이 성공적으로 등록되었습니다.',
@@ -210,6 +238,25 @@ export class FeedbackService {
         updatedAt: true,
       },
     });
+
+    // 게스트 feedback 수정 로그 기록
+    await this.activityLogService.createLog(
+      null, // 게스트는 userId가 없음
+      invitation.projectId,
+      `게스트가 피드백을 수정하였습니다. (게스트명: ${invitation.guest.name}, 피드백 ID: ${updatedFeedback.id})`,
+      {
+        feedbackId: updatedFeedback.id,
+        guestId: invitation.guest.id,
+        guestName: invitation.guest.name,
+        projectId: invitation.projectId,
+        revisionId: existingFeedback.revisionId,
+        revisionNo: existingFeedback.revision.revNo,
+        trackId: existingFeedback.trackId,
+        trackName: existingFeedback.track.name,
+        oldContent: existingFeedback.content,
+        newContent: updatedFeedback.content,
+      }
+    );
 
     return {
       success: true,
@@ -424,6 +471,24 @@ export class FeedbackService {
       },
     });
 
+    // 게스트 피드백 삭제 로그 기록
+    await this.activityLogService.createLog(
+      null, // 게스트는 userId가 없음
+      invitation.projectId,
+      `게스트가 피드백을 삭제하였습니다. (게스트명: ${invitation.guest.name}, 피드백 ID: ${existingFeedback.id})`,
+      {
+        feedbackId: existingFeedback.id,
+        guestId: invitation.guest.id,
+        guestName: invitation.guest.name,
+        projectId: invitation.projectId,
+        revisionId: existingFeedback.revisionId,
+        revisionNo: existingFeedback.revision.revNo,
+        trackId: existingFeedback.trackId,
+        trackName: existingFeedback.track.name,
+        deletedContent: existingFeedback.content,
+      }
+    );
+
     return {
       success: true,
       message: '피드백이 성공적으로 삭제되었습니다.',
@@ -505,6 +570,25 @@ export class FeedbackService {
         updatedAt: true,
       },
     });
+
+    // 피드백 답글 설정 로그 기록
+    await this.activityLogService.createLog(
+      userId,
+      feedback.projectId,
+      `피드백에 답글을 설정하였습니다. (피드백 ID: ${feedback.id}, 게스트명: ${feedback.authorGuest.name})`,
+      {
+        feedbackId: feedback.id,
+        projectId: feedback.projectId,
+        revisionId: feedback.revisionId,
+        revisionNo: feedback.revision.revNo,
+        trackId: feedback.trackId,
+        trackName: feedback.track.name,
+        guestName: feedback.authorGuest.name,
+        feedbackContent: feedback.content,
+        replyContent: updatedFeedback.reply,
+        solved: updatedFeedback.solved,
+      }
+    );
 
     return {
       success: true,
@@ -593,6 +677,25 @@ export class FeedbackService {
         updatedAt: true,
       },
     });
+
+    // 피드백 답글 삭제 로그 기록
+    await this.activityLogService.createLog(
+      userId,
+      feedback.projectId,
+      `피드백 답글을 삭제하였습니다. (피드백 ID: ${feedback.id}, 게스트명: ${feedback.authorGuest.name})`,
+      {
+        feedbackId: feedback.id,
+        projectId: feedback.projectId,
+        revisionId: feedback.revisionId,
+        revisionNo: feedback.revision.revNo,
+        trackId: feedback.trackId,
+        trackName: feedback.track.name,
+        guestName: feedback.authorGuest.name,
+        feedbackContent: feedback.content,
+        deletedReplyContent: existingReply,
+        solved: updatedFeedback.solved,
+      }
+    );
 
     return {
       success: true,

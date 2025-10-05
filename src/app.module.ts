@@ -5,6 +5,7 @@ import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CommonModule } from './common/common.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { FilesModule } from './files/files.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -26,6 +27,7 @@ import { ToolModule } from './tool/tool.module';
       serveRoot: '/files',
     }),
     PrismaModule,
+    CommonModule,
     AuthModule,
     ProjectsModule,
     FeedbackModule,

@@ -21,8 +21,9 @@ model User {
   updatedAt DateTime  @updatedAt
 
   // 관계
-  projects Project[]
-  guests   Guest[]  // 호스트가 초대한 게스트들
+  projects     Project[]
+  guests       Guest[]  // 호스트가 초대한 게스트들
+  activityLogs ActivityLog[]
 
   @@map("users")
 }
@@ -51,6 +52,7 @@ model Project {
   invitations    Invitation[]
   feedbacks      Feedback[]
   payCheckPoints PayCheckPoint[]
+  activityLogs   ActivityLog[]
 
   @@map("projects")
 }
@@ -215,4 +217,24 @@ model PayCheckPoint {
   // 인덱스
   @@index([projectId])
   @@map("paycheckpoints")
+}
+
+// ActivityLog 모델
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?     // 사용자 ID (nullable)
+  projectId Int?     // 프로젝트 ID (nullable)
+  msg       String?  @db.Text // 메시지
+  params    String?  @db.Text // 파라미터
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 관계
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  // 인덱스
+  @@index([userId])
+  @@index([projectId])
+  @@map("activitylogs")
 }

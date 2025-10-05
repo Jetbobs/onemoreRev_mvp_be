@@ -19,8 +19,10 @@ import {
 import { Request } from 'express';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { GetProjectInfoDto } from './dto/get-project-info.dto';
+import { GetProjectLogsDto } from './dto/get-project-logs.dto';
 import { ProjectInfoResponseDto } from './dto/project-info-response.dto';
 import { ProjectListResponseDto } from './dto/project-list-response.dto';
+import { ProjectLogsResponseDto } from './dto/project-logs-response.dto';
 import { ProjectResponseDto } from './dto/project-response.dto';
 import { UpdatePayCheckPointPaidResponseDto } from './dto/update-paycheckpoint-paid-response.dto';
 import { UpdatePayCheckPointPaidDto } from './dto/update-paycheckpoint-paid.dto';
@@ -204,5 +206,57 @@ export class ProjectsController {
       throw new UnauthorizedException('로그인이 필요합니다.');
     }
     return this.projectsService.updatePayCheckPointPaid(updatePayCheckPointPaidDto, req.session.userId);
+  }
+
+  @Get('logs')
+  @ApiOperation({
+    summary: '프로젝트 활동 로그 조회',
+    description: '특정 프로젝트의 활동 로그를 시간순 오름차순으로 조회합니다. 프로젝트 소유자만 조회할 수 있습니다.'
+  })
+  @ApiQuery({
+    name: 'projectId',
+    description: '프로젝트 ID',
+    type: Number,
+    example: 1
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: '조회할 로그 개수 제한 (입력하지 않거나 음수인 경우 모든 로그 조회)',
+    type: Number,
+    required: false,
+    example: 100
+  })
+  @ApiResponse({
+    status: 200,
+    description: '프로젝트 활동 로그 조회 성공',
+    type: ProjectLogsResponseDto
+  })
+  @ApiResponse({
+    status: 400,
+    description: '잘못된 요청 데이터입니다.'
+  })
+  @ApiResponse({
+    status: 401,
+    description: '로그인이 필요합니다.'
+  })
+  @ApiResponse({
+    status: 403,
+    description: '해당 프로젝트에 대한 권한이 없습니다.'
+  })
+  @ApiResponse({
+    status: 404,
+    description: '프로젝트를 찾을 수 없습니다.'
+  })
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getProjectLogs(
+    @Query() getProjectLogsDto: GetProjectLogsDto,
+    @Req() req: Request
+  ): Promise<ProjectLogsResponseDto> {
+    // 세션에서 사용자 ID 확인
+    if (!req.session.userId) {
+      throw new UnauthorizedException('로그인이 필요합니다.');
+    }
+
+    return this.projectsService.getProjectLogs(getProjectLogsDto, req.session.userId);
   }
 }

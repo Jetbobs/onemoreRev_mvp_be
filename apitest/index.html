@@ -598,6 +598,7 @@
                         <button class="tab-button" onclick="showTab('track-add')">🎵 트랙추가</button>
                         <button class="tab-button" onclick="showTab('history')">📊 히스토리</button>
                         <button class="tab-button" onclick="showTab('paycheckpoint-paid')">💰 지급상태변경</button>
+                        <button class="tab-button" onclick="showTab('project-logs')">📋 활동로그조회</button>
                     </div>
                 </div>
                 
@@ -994,6 +995,44 @@
                 </div>
                 
                 <button class="submit-button" onclick="createRevision()">Run</button>
+            </div>
+        </div>
+
+        <!-- 프로젝트 로그 조회 탭 -->
+        <div id="project-logs-tab" class="tab-content">
+            <div class="api-section">
+                <div class="api-url">
+                    <span class="http-method get">GET</span>
+                    <span>/api/v1/project/logs</span>
+                    <button class="url-copy-btn" onclick="copyUrl('/api/v1/project/logs')">복사</button>
+                </div>
+                <p>특정 프로젝트의 활동 로그를 시간순 오름차순으로 조회합니다.</p>
+                
+                <div class="form-group">
+                    <label for="project-logs-id">프로젝트 ID:</label>
+                    <input type="number" id="project-logs-id" value="1" min="1" placeholder="프로젝트 ID를 입력해주세요">
+                </div>
+                
+                <div class="form-group">
+                    <label for="project-logs-limit">조회할 로그 개수 (입력하지 않거나 음수인 경우 모든 로그 조회):</label>
+                    <input type="number" id="project-logs-limit" value="" placeholder="조회할 로그 개수를 입력해주세요 (비워두면 모든 로그)">
+                </div>
+                
+                <div class="code-response-container">
+                    <div class="code-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <span class="code-label">예제 코드</span>
+                            <button class="copy-btn" onclick="copyCode('project-logs-code')">복사</button>
+                        </div>
+                        <div class="code-example" id="project-logs-code"></div>
+                    </div>
+                    <div class="response-section">
+                        <span class="response-label">응답 결과</span>
+                        <div id="project-logs-response" class="response" style="display: none;"></div>
+                        <div id="project-logs-status" class="status-code" style="display: none;"></div>
+                    </div>
+                </div>
+                <button class="submit-button" onclick="getProjectLogs()">Run</button>
             </div>
         </div>
 
@@ -1672,6 +1711,7 @@
             updateRevisionInfoCode();
             updateLogoutCode();
             updatePayCheckPointPaidCode();
+            updateProjectLogsCode();
             
             // 프로젝트 목록 로드
             loadProjects();
@@ -1744,6 +1784,10 @@
             // 지급상태변경 필드들
             document.getElementById('paycheckpoint-id').addEventListener('input', updatePayCheckPointPaidCode);
             document.getElementById('paycheckpoint-paid-amount').addEventListener('input', updatePayCheckPointPaidCode);
+            
+            // 프로젝트 로그 조회 필드들
+            document.getElementById('project-logs-id').addEventListener('input', updateProjectLogsCode);
+            document.getElementById('project-logs-limit').addEventListener('input', updateProjectLogsCode);
         }
 
         // 게스트 관리 함수들
@@ -3333,6 +3377,65 @@ fetch(host + '/api/v1/project/paycheckpoint/paid', {
             } catch (error) {
                 showResponse('paycheckpoint-paid-response', { error: error.message }, true);
                 showStatusCode('paycheckpoint-paid-status', 0);
+            }
+        }
+
+        // 프로젝트 로그 조회 코드 업데이트
+        function updateProjectLogsCode() {
+            const projectId = document.getElementById('project-logs-id').value;
+            const limit = document.getElementById('project-logs-limit').value;
+            
+            const params = new URLSearchParams();
+            if (projectId) params.append('projectId', projectId);
+            if (limit) params.append('limit', limit);
+            
+            const queryString = params.toString();
+            const url = queryString ? `?${queryString}` : '';
+            
+            const code = `const host = '${HOST}';
+fetch(host + '/api/v1/project/logs${url}', {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  credentials: 'include'
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));`;
+            
+            document.getElementById('project-logs-code').textContent = code;
+        }
+
+        // 프로젝트 로그 조회 실행
+        async function getProjectLogs() {
+            const projectId = document.getElementById('project-logs-id').value;
+            const limit = document.getElementById('project-logs-limit').value;
+            
+            if (!projectId) {
+                alert('프로젝트 ID를 입력해주세요.');
+                return;
+            }
+            
+            try {
+                const params = new URLSearchParams();
+                params.append('projectId', projectId);
+                if (limit) params.append('limit', limit);
+                
+                const response = await fetch(`${HOST}/api/v1/project/logs?${params.toString()}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                
+                const result = await response.json();
+                showResponse('project-logs-response', result, !response.ok);
+                showStatusCode('project-logs-status', response.status);
+            } catch (error) {
+                showResponse('project-logs-response', { error: error.message }, true);
+                showStatusCode('project-logs-status', 0);
             }
         }
 

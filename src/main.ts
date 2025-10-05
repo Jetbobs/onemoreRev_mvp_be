@@ -28,9 +28,9 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  // Body parser 설정 (50MB 제한)
-  app.use(json({ limit: '50mb' }));
-  app.use(urlencoded({ extended: true, limit: '50mb' }));
+  // Body parser 설정 (200MB 제한)
+  app.use(json({ limit: '200mb' }));
+  app.use(urlencoded({ extended: true, limit: '200mb' }));
 
   // 전역 ValidationPipe 설정
   app.useGlobalPipes(new ValidationPipe({

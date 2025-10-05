@@ -2,6 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException,
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
+import { ActivityLogService } from '../common/services/activity-log.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ReviewDoneResponseDto } from '../revisions/dto/review-done-response.dto';
 import { ReviewDoneDto } from '../revisions/dto/review-done.dto';
@@ -10,9 +11,11 @@ import { AddTrackDto } from './dto/add-track.dto';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { CreateRevisionDto } from './dto/create-revision.dto';
 import { GetProjectInfoDto } from './dto/get-project-info.dto';
+import { GetProjectLogsDto } from './dto/get-project-logs.dto';
 import { GetRevisionInfoDto } from './dto/get-revision-info.dto';
 import { ProjectInfoResponseDto } from './dto/project-info-response.dto';
 import { LastRevisionDto, ProjectListItemDto, ProjectListResponseDto } from './dto/project-list-response.dto';
+import { ProjectLogsResponseDto } from './dto/project-logs-response.dto';
 import { ProjectResponseDto } from './dto/project-response.dto';
 import { RevisionInfoResponseDto, RevisionTrackDto } from './dto/revision-info-response.dto';
 import { RevisionResponseDto } from './dto/revision-response.dto';
@@ -23,7 +26,10 @@ import { UpdatePayCheckPointPaidDto } from './dto/update-paycheckpoint-paid.dto'
 
 @Injectable()
 export class ProjectsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private activityLogService: ActivityLogService,
+  ) {}
 
   /**
    * base64 형식의 16자리 랜덤 코드 생성
@@ -61,6 +67,8 @@ export class ProjectsService {
           name: true,
           description: true,
           authorId: true,
+          totalPrice: true,
+          modLimit: true,
           createdAt: true,
         },
       });
@@ -169,6 +177,20 @@ export class ProjectsService {
       };
     });
 
+    // 활동 로그 기록
+    await this.activityLogService.createLog(
+      userId,
+      result.project.id,
+      `프로젝트를 생성하였습니다. (프로젝트 ID: ${result.project.id}, 프로젝트명: ${result.project.name})`,
+      {
+        projectName: result.project.name,
+        projectId: result.project.id,
+        totalPrice: result.project.totalPrice,
+        modLimit: result.project.modLimit,
+        payCheckPointsCount: createProjectDto.payCheckPoints?.length || 0,
+      }
+    );
+
     return {
       success: true,
       message: '프로젝트가 성공적으로 생성되었습니다.',
@@ -242,6 +264,18 @@ export class ProjectsService {
 
       return newRevision;
     });
+
+    // 활동 로그 기록
+    await this.activityLogService.createLog(
+      userId,
+      revision.projectId,
+      `리비전을 생성하였습니다. (리비전 ID: ${revision.id}, 리비전 번호: ${revision.revNo})`,
+      {
+        revisionId: revision.id,
+        revisionNo: revision.revNo,
+        projectId: revision.projectId,
+      }
+    );
 
     return {
       success: true,
@@ -505,6 +539,10 @@ export class ProjectsService {
       for (const upload of submitRevisionDto.uploads) {
         const fileData = upload.file;
         
+        // 해당 트랙 정보 찾기
+        const track = tracks.find(t => t.id === upload.trackId);
+        const trackName = track?.name || '알 수 없음';
+        
         // Base64 디코딩
         const fileBuffer = Buffer.from(fileData.data, 'base64');
         
@@ -553,6 +591,21 @@ export class ProjectsService {
           uploadedAt: savedFile.uploadedAt,
         });
 
+        // 이미지 파일 DB등록 로그 기록 (리비전 제출 로그보다 먼저)
+        await this.activityLogService.createLog(
+          userId,
+          revision.projectId,
+          `이미지 파일이 업로드 되었습니다. (파일명: ${savedFile.originalFilename}, 트랙: ${trackName}, 크기: ${Number(savedFile.fileSize)} bytes)`,
+          {
+            revisionId: submitRevisionDto.revisionId,
+            trackId: upload.trackId,
+            fileName: savedFile.originalFilename,
+            fileSize: Number(savedFile.fileSize),
+            mimeType: savedFile.mimeType,
+            isSrcFile: false,
+          }
+        );
+
         // srcFile이 있는 경우 소스 파일도 저장
         if (upload.srcFile) {
           const srcFileData = upload.srcFile;
@@ -572,7 +625,7 @@ export class ProjectsService {
           const srcMimeType = this.getMimeType(srcFileExtension);
           
           // 데이터베이스에 소스 파일 정보 저장 (src=true)
-          await tx.file.create({
+          const savedSrcFile = await tx.file.create({
             data: {
               revisionId: submitRevisionDto.revisionId,
               trackId: upload.trackId,
@@ -585,6 +638,21 @@ export class ProjectsService {
               src: true, // 소스 파일
             },
           });
+
+          // 소스 파일 DB등록 로그 기록
+          await this.activityLogService.createLog(
+            userId,
+            revision.projectId,
+            `소스 파일이 업로드 되었습니다. (파일명: ${srcFileData.original_filename}, 트랙: ${trackName}, 크기: ${srcFileData.size} bytes)`,
+            {
+              revisionId: submitRevisionDto.revisionId,
+              trackId: upload.trackId,
+              fileName: srcFileData.original_filename,
+              fileSize: srcFileData.size,
+              mimeType: srcMimeType,
+              isSrcFile: true,
+            }
+          );
         }
       }
 
@@ -602,6 +670,20 @@ export class ProjectsService {
         files: savedFiles,
       };
     });
+
+    // 리비전 제출 완료 로그 기록
+    await this.activityLogService.createLog(
+      userId,
+      revision.projectId,
+      `리비전을 제출하였습니다. (리비전 ID: ${result.revision.id}, 업로드된 파일 수: ${result.files.length}개)`,
+      {
+        revisionId: result.revision.id,
+        projectId: revision.projectId,
+        projectName: revision.project.name,
+        fileCount: result.files.length,
+        description: submitRevisionDto.description,
+      }
+    );
 
     return {
       success: true,
@@ -879,6 +961,20 @@ export class ProjectsService {
         createdAt: true,
       },
     });
+
+    // 활동 로그 기록
+    await this.activityLogService.createLog(
+      userId,
+      track.projectId,
+      `트랙을 생성하였습니다. (트랙 ID: ${track.id}, 트랙명: ${track.name}, 리비전 번호: ${track.createdRevNo})`,
+      {
+        trackId: track.id,
+        trackName: track.name,
+        projectId: track.projectId,
+        createdRevNo: track.createdRevNo,
+        createdRevId: track.createdRevId,
+      }
+    );
 
     return {
       success: true,
@@ -1264,6 +1360,24 @@ export class ProjectsService {
       },
     });
 
+    // 게스트 리뷰 완료 로그 기록
+    await this.activityLogService.createLog(
+      null, // 게스트는 userId가 없음
+      revision.project.id,
+      `게스트가 리뷰를 완료하였습니다. (게스트명: ${invitation.guest.name}, 리비전 번호: ${updatedRevision.revNo})`,
+      {
+        revisionId: updatedRevision.id,
+        revisionNo: updatedRevision.revNo,
+        projectId: revision.project.id,
+        projectName: revision.project.name,
+        guestId: invitation.guest.id,
+        guestName: invitation.guest.name,
+        previousStatus: 'submitted',
+        newStatus: updatedRevision.status,
+        reviewedAt: updatedRevision.updatedAt,
+      }
+    );
+
     return {
       success: true,
       message: '리비전 리뷰가 성공적으로 완료되었습니다.',
@@ -1322,6 +1436,23 @@ export class ProjectsService {
       },
     });
 
+    // 지급상태 변경 로그 기록
+    await this.activityLogService.createLog(
+      userId,
+      paycheckpoint.projectId,
+      `지급상태를 변경하였습니다. (${updatedPayCheckPoint.label}: ${paycheckpoint.paidAmount.toLocaleString()}원 → ${updatedPayCheckPoint.paidAmount.toLocaleString()}원)`,
+      {
+        paycheckpointId: updatedPayCheckPoint.id,
+        projectId: paycheckpoint.projectId,
+        projectName: paycheckpoint.project.name,
+        label: updatedPayCheckPoint.label,
+        totalPrice: updatedPayCheckPoint.price,
+        oldPaidAmount: paycheckpoint.paidAmount,
+        newPaidAmount: updatedPayCheckPoint.paidAmount,
+        payDate: paycheckpoint.payDate,
+      }
+    );
+
     return {
       success: true,
       message: '지급 체크포인트의 지급액수가 성공적으로 업데이트되었습니다.',
@@ -1329,6 +1460,75 @@ export class ProjectsService {
       paidAmount: updatedPayCheckPoint.paidAmount,
       label: updatedPayCheckPoint.label,
       price: updatedPayCheckPoint.price,
+    };
+  }
+
+  /**
+   * 프로젝트의 활동 로그를 조회합니다.
+   * @param getProjectLogsDto 프로젝트 로그 조회 조건
+   * @param userId 사용자 ID (프로젝트 소유자 확인용)
+   * @returns 프로젝트 활동 로그 목록
+   */
+  async getProjectLogs(
+    getProjectLogsDto: GetProjectLogsDto,
+    userId: number,
+  ): Promise<ProjectLogsResponseDto> {
+    // 프로젝트 존재 여부 및 소유자 확인
+    const project = await this.prisma.project.findUnique({
+      where: { id: getProjectLogsDto.projectId },
+      select: {
+        id: true,
+        name: true,
+        authorId: true,
+      },
+    });
+
+    if (!project) {
+      throw new NotFoundException('프로젝트를 찾을 수 없습니다.');
+    }
+
+    if (project.authorId !== userId) {
+      throw new ForbiddenException('해당 프로젝트에 대한 권한이 없습니다.');
+    }
+
+    // 활동 로그 조회 (시간순 오름차순)
+    const queryOptions: any = {
+      where: { projectId: getProjectLogsDto.projectId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' }, // 시간순 오름차순
+    };
+
+    // limit이 양수인 경우에만 take 옵션 추가
+    if (getProjectLogsDto.limit && getProjectLogsDto.limit > 0) {
+      queryOptions.take = getProjectLogsDto.limit;
+    }
+
+    const logs = await this.prisma.activityLog.findMany(queryOptions);
+
+    return {
+      success: true,
+      message: '프로젝트 활동 로그를 성공적으로 조회했습니다.',
+      projectId: project.id,
+      projectName: project.name,
+      totalCount: logs.length,
+      logs: logs.map(log => ({
+        id: log.id,
+        userId: log.userId,
+        projectId: log.projectId,
+        msg: log.msg,
+        params: log.params,
+        createdAt: log.createdAt,
+        updatedAt: log.updatedAt,
+        user: (log as any).user, // 타입 단언으로 user 속성 접근
+      })),
     };
   }
 }
