@@ -55,7 +55,10 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3500'],
+    origin: [
+              'http://localhost:3000', 'http://localhost:3500',
+              'http://ec2-43-202-48-197.ap-northeast-2.compute.amazonaws.com:3000', 'http://ec2-43-202-48-197.ap-northeast-2.compute.amazonaws.com:3500',
+            ],
     credentials: true,
   });
 
