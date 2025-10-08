@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px 20px 20px 20px;
             background-color: #f5f5f5;
@@ -22,7 +22,7 @@
             color: #333;
             text-align: center;
             margin: 0 0 15px 0;
-            font-size: 0.7em;
+            font-size: 1.4em;
         }
         .api-section {
             margin-bottom: 30px;
@@ -32,14 +32,14 @@
             background-color: #fafafa;
         }
         .api-title {
-            font-size: 18px;
+            font-size: 36px;
             font-weight: bold;
             color: #2c3e50;
             margin-bottom: 10px;
         }
         .api-url {
             font-family: 'Courier New', monospace;
-            font-size: 12px;
+            font-size: 24px;
             color: #666;
             background-color: #f8f9fa;
             padding: 5px 10px;
@@ -51,7 +51,7 @@
             gap: 10px;
         }
         .http-method {
-            font-size: 10px;
+            font-size: 20px;
             font-weight: bold;
             padding: 2px 6px;
             border-radius: 2px;
@@ -83,7 +83,7 @@
             margin-bottom: 0px;
             font-weight: bold;
             color: #555;
-            font-size: 7.84px;
+            font-size: 15.68px;
             line-height: 1;
         }
          input, textarea {
@@ -91,9 +91,15 @@
              padding: 3.5px;
              border: 1px solid #ddd;
              border-radius: 4px;
-             font-size: 7.84px;
+             font-size: 15.68px;
              box-sizing: border-box;
              outline: none;
+         }
+         input[type="date"] {
+             width: 36%;
+         }
+         #project-mod-criteria {
+             width: 100%;
          }
          input:focus, textarea:focus {
              border: 1px solid #007bff;
@@ -110,7 +116,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 28px;
             margin-right: 10px;
         }
         button:hover {
@@ -124,7 +130,7 @@
             border-left: 4px solid #3498db;
             white-space: pre-wrap;
             font-family: monospace;
-            font-size: 12px;
+            font-size: 24px;
         }
         .error {
             border-left-color: #e74c3c;
@@ -142,7 +148,7 @@
             background-color: #2d3748;
             border-radius: 5px;
             font-family: 'Courier New', monospace;
-            font-size: 9.6px;
+            font-size: 19.2px;
             color: #e2e8f0;
             white-space: pre-wrap;
             border: 1px solid #4a5568;
@@ -166,7 +172,7 @@
         }
         
         .code-label {
-            font-size: 14px;
+            font-size: 28px;
             font-weight: bold;
             color: #495057;
             margin-bottom: 5px;
@@ -179,7 +185,7 @@
             border: none;
             border-radius: 3px;
             padding: 4px 8px;
-            font-size: 11px;
+            font-size: 22px;
             cursor: pointer;
             float: right;
             margin-top: 5px;
@@ -203,7 +209,7 @@
             border: none;
             border-radius: 2px;
             padding: 2px 6px;
-            font-size: 10px;
+            font-size: 20px;
             cursor: pointer;
             margin-left: 8px;
         }
@@ -233,7 +239,7 @@
             border-radius: 4px;
             padding: 10px;
             font-family: 'Courier New', monospace;
-            font-size: 9.6px;
+            font-size: 19.2px;
             color: #e0e0e0;
             white-space: pre-wrap;
             max-height: 200px;
@@ -242,7 +248,7 @@
         }
         
         .response-label {
-            font-size: 14px;
+            font-size: 28px;
             font-weight: bold;
             color: #495057;
             margin-bottom: 5px;
@@ -253,7 +259,7 @@
             margin-top: 8px;
             padding: 4px 8px;
             border-radius: 3px;
-            font-size: 11px;
+            font-size: 22px;
             font-weight: bold;
             font-family: 'Courier New', monospace;
             display: inline-block;
@@ -285,7 +291,7 @@
             color: white;
             border: none;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 32px;
             font-weight: bold;
             cursor: pointer;
             margin-top: 2.5px;
@@ -317,7 +323,7 @@
             border: none;
             border-radius: 3px;
             padding: 3px 8px;
-            font-size: 10px;
+            font-size: 20px;
             cursor: pointer;
         }
         
@@ -343,7 +349,7 @@
             border: none;
             border-radius: 3px;
             padding: 3px 8px;
-            font-size: 10px;
+            font-size: 20px;
             cursor: pointer;
         }
         
@@ -357,7 +363,7 @@
             border: none;
             border-radius: 3px;
             padding: 5px 10px;
-            font-size: 11px;
+            font-size: 22px;
             cursor: pointer;
             margin-top: 5px;
         }
@@ -391,7 +397,7 @@
         
         .tab-group-title {
             font-weight: bold;
-            font-size: 60%;
+            font-size: 120%;
             color: #495057;
             margin: 0; /* inline 레이아웃 */
             padding: 0 6px 0 0;
@@ -411,7 +417,7 @@
             padding: 3px 6px;
             border-radius: 3px;
             cursor: pointer;
-            font-size: 8.5px;
+            font-size: 17px;
             color: #333;
             transition: all 0.3s ease;
             margin: 0 !important;
@@ -494,7 +500,7 @@
 
         .track-thumbnail-title {
             font-weight: bold;
-            font-size: 12px;
+            font-size: 24px;
             margin-bottom: 5px;
             color: #333;
         }
@@ -510,7 +516,7 @@
         }
 
         .track-thumbnail-file-info {
-            font-size: 7px;
+            font-size: 28px;
             color: #666;
             line-height: 1.2;
         }
@@ -529,7 +535,7 @@
             align-items: center;
             justify-content: center;
             color: #999;
-            font-size: 11px;
+            font-size: 22px;
             margin: 0 auto 5px auto;
         }
 
@@ -541,7 +547,7 @@
 
         .upload-text {
             color: #666;
-            font-size: 14px;
+            font-size: 28px;
             margin-bottom: 10px;
         }
 
@@ -550,7 +556,7 @@
             padding: 8px;
             border-radius: 4px;
             margin-top: 10px;
-            font-size: 12px;
+            font-size: 24px;
             color: #495057;
         }
 
@@ -560,7 +566,7 @@
             border: none;
             border-radius: 3px;
             padding: 2px 6px;
-            font-size: 10px;
+            font-size: 20px;
             cursor: pointer;
             margin-left: 5px;
         }
@@ -973,7 +979,7 @@
                 <label for="revision-new-project-id">프로젝트 ID:</label>
                 <input type="number" id="revision-new-project-id" placeholder="프로젝트 ID를 입력해주세요" value="1">
                 
-                <div style="margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px; font-size: 14px;">
+                <div style="margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px; font-size: 16.8px;">
                     <strong>🆕 다음 리비전 생성 기능:</strong><br>
                     • 프로젝트에 새로운 리비전 생성<br>
                     • 이전 리비전의 상태가 reviewed여야 생성 가능<br>
@@ -1045,16 +1051,8 @@
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/revision/info')">복사</button>
                 </div>
                 
-                <label for="revision-info-project-id">프로젝트 ID:</label>
-                <input type="number" id="revision-info-project-id" placeholder="프로젝트 ID를 입력해주세요" value="1">
-                
-                <label for="revision-info-rev-no">리비전 번호:</label>
-                <input type="number" id="revision-info-rev-no" placeholder="리비전 번호를 입력해주세요" value="1">
-                
-                <label for="revision-info-code">초대 코드 (게스트용, 선택사항):</label>
-                <input type="text" id="revision-info-code" placeholder="초대 코드를 입력해주세요" maxlength="16">
-                
-                <div style="margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px; font-size: 14px;">
+                <div class="api-title" style="font-size: 21.6px;">리비전 조회</div>
+                <div style="margin: 10px 0 20px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px; font-size: 16.8px;">
                     <strong>📋 리비전 조회 기능:</strong><br>
                     • 프로젝트 ID와 리비전 번호로 리비전 조회<br>
                     • 프로젝트의 모든 트랙과 최신 파일 정보<br>
@@ -1063,6 +1061,15 @@
                     • 첫 번째 게스트 초대 코드 정보 포함<br>
                     • 프로젝트 소유자 또는 초대 코드를 가진 게스트 조회 가능
                 </div>
+                
+                <label for="revision-info-project-id">프로젝트 ID:</label>
+                <input type="number" id="revision-info-project-id" placeholder="프로젝트 ID를 입력해주세요" value="1">
+                
+                <label for="revision-info-rev-no">리비전 번호:</label>
+                <input type="number" id="revision-info-rev-no" placeholder="리비전 번호를 입력해주세요" value="1">
+                
+                <label for="revision-info-invitation-code">초대 코드 (게스트용, 선택사항):</label>
+                <input type="text" id="revision-info-invitation-code" placeholder="초대 코드를 입력해주세요" maxlength="16">
                 
                 <div class="code-response-container">
                     <div class="code-section">
@@ -1169,7 +1176,7 @@
                     <span>/api/v1/revision/review/done</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/revision/review/done')">복사</button>
                 </div>
-                <div class="api-title">리비전 리뷰 완료 (게스트용)</div>
+                <div class="api-title" style="font-size: 18px;">리비전 리뷰 완료 (게스트용)</div>
                 <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
                     게스트(프로젝트 의뢰인)가 리비전 리뷰를 완료합니다.<br>
                     submitted 상태의 리비전을 reviewed 상태로 변경합니다.
@@ -1185,7 +1192,7 @@
                     <input type="number" id="review-done-revision-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 </div>
                 
-                <button onclick="reviewDone()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">리뷰 완료</button>
+                <button onclick="reviewDone()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 32px;">리뷰 완료</button>
                 
                 <div class="code-response-container" style="margin-top: 20px;">
                     <div class="code-section">
@@ -1208,8 +1215,8 @@
                     <span>/api/v1/feedback</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback')">복사</button>
                 </div>
-                <div class="api-title">피드백 등록 (게스트용)</div>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                <div class="api-title" style="font-size: 21.6px;">피드백 등록 (게스트용)</div>
+                <p style="color: #666; font-size: 16.8px; margin-bottom: 15px;">
                     게스트(프로젝트 의뢰인)가 디자인에 대한 피드백을 등록합니다.<br>
                     초대 코드를 통해 권한을 확인합니다.
                 </p>
@@ -1249,7 +1256,7 @@
                     <textarea id="feedback-content" placeholder="이 부분의 색상을 더 밝게 해주세요." rows="3" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"></textarea>
                 </div>
                 
-                <button onclick="submitFeedback()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">피드백 등록</button>
+                <button onclick="submitFeedback()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 32px;">피드백 등록</button>
             </div>
         </div>
 
@@ -1261,8 +1268,8 @@
                     <span>/api/v1/feedback</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback')">복사</button>
                 </div>
-                <div class="api-title">피드백 수정 (게스트용)</div>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                <div class="api-title" style="font-size: 21.6px;">피드백 수정 (게스트용)</div>
+                <p style="color: #666; font-size: 16.8px; margin-bottom: 15px;">
                     게스트(프로젝트 의뢰인)가 자신이 작성한 피드백의 내용을 수정합니다.<br>
                     초대 코드를 통해 권한을 확인합니다.
                 </p>
@@ -1282,7 +1289,7 @@
                     <textarea id="edit-feedback-content" placeholder="이 부분의 색상을 더 어둡게 해주세요." rows="3" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"></textarea>
                 </div>
                 
-                <button onclick="editFeedback()" style="background-color: #ffc107; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">피드백 수정</button>
+                <button onclick="editFeedback()" style="background-color: #ffc107; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 32px;">피드백 수정</button>
             </div>
         </div>
 
@@ -1294,8 +1301,8 @@
                     <span>/api/v1/feedback</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback')">복사</button>
                 </div>
-                <div class="api-title">피드백 목록 조회 (리비전 단위)</div>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                <div class="api-title" style="font-size: 21.6px;">피드백 목록 조회 (리비전 단위)</div>
+                <p style="color: #666; font-size: 16.8px; margin-bottom: 15px;">
                     게스트(프로젝트 의뢰인) 또는 프로젝트 소유자가 특정 리비전의 피드백 목록을 조회합니다.<br>
                     로그인된 경우 프로젝트 소유자 권한을 확인하고, 그렇지 않은 경우 초대 코드를 통해 게스트 권한을 확인합니다.
                 </p>
@@ -1310,7 +1317,7 @@
                     <input type="number" id="list-feedback-revision-id" placeholder="9" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 </div>
                 
-                <button onclick="getFeedbackList()" style="background-color: #17a2b8; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">피드백 목록 조회</button>
+                <button onclick="getFeedbackList()" style="background-color: #17a2b8; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 32px;">피드백 목록 조회</button>
                 
                 <div id="feedback-list-result" style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 4px; display: none;">
                     <h4>조회 결과</h4>
@@ -1327,8 +1334,8 @@
                     <span>/api/v1/feedback</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback')">복사</button>
                 </div>
-                <div class="api-title">피드백 삭제 (게스트용)</div>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                <div class="api-title" style="font-size: 21.6px;">피드백 삭제 (게스트용)</div>
+                <p style="color: #666; font-size: 16.8px; margin-bottom: 15px;">
                     게스트(프로젝트 의뢰인)가 자신이 작성한 피드백을 삭제합니다.<br>
                     초대 코드를 통해 권한을 확인합니다.
                 </p>
@@ -1343,7 +1350,7 @@
                     <input type="number" id="delete-feedback-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 </div>
                 
-                <button onclick="deleteFeedback()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">피드백 삭제</button>
+                <button onclick="deleteFeedback()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 32px;">피드백 삭제</button>
             </div>
         </div>
 
@@ -1355,8 +1362,8 @@
                     <span>/api/v1/feedback/reply</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/reply')">복사</button>
                 </div>
-                <div class="api-title">피드백 답글 설정 (소유자용)</div>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                <div class="api-title" style="font-size: 21.6px;">피드백 답글 설정 (소유자용)</div>
+                <p style="color: #666; font-size: 16.8px; margin-bottom: 15px;">
                     프로젝트 소유자가 피드백에 답글을 설정합니다. 기존 답글이 있으면 덮어씁니다.<br>
                     리비전 상태가 'reviewed'일 때만 가능합니다.
                 </p>
@@ -1371,7 +1378,7 @@
                     <textarea id="reply-set-content" placeholder="피드백을 확인했습니다. 수정하겠습니다." rows="4" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"></textarea>
                 </div>
                 
-                <button onclick="setFeedbackReply()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">답글 설정</button>
+                <button onclick="setFeedbackReply()" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 32px;">답글 설정</button>
                 
                 <div class="code-response-container" style="margin-top: 20px;">
                     <div class="code-section">
@@ -1394,8 +1401,8 @@
                     <span>/api/v1/feedback/reply</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/feedback/reply')">복사</button>
                 </div>
-                <div class="api-title">피드백 답글 삭제 (소유자용)</div>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                <div class="api-title" style="font-size: 21.6px;">피드백 답글 삭제 (소유자용)</div>
+                <p style="color: #666; font-size: 16.8px; margin-bottom: 15px;">
                     프로젝트 소유자가 피드백의 답글을 삭제합니다.<br>
                     리비전 상태가 'reviewed'일 때만 가능합니다.
                 </p>
@@ -1405,7 +1412,7 @@
                     <input type="number" id="reply-delete-feedback-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 </div>
                 
-                <button onclick="deleteFeedbackReply()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">답글 삭제</button>
+                <button onclick="deleteFeedbackReply()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 32px;">답글 삭제</button>
                 
                 <div class="code-response-container" style="margin-top: 20px;">
                     <div class="code-section">
@@ -1428,8 +1435,8 @@
                     <span>/api/v1/project/history</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/project/history')">복사</button>
                 </div>
-                <div class="api-title">프로젝트 히스토리 조회</div>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                <div class="api-title" style="font-size: 21.6px;">프로젝트 히스토리 조회</div>
+                <p style="color: #666; font-size: 16.8px; margin-bottom: 15px;">
                     프로젝트의 모든 리비전과 각 리비전의 업로드 파일, 해당 리비전에서 생성된 트랙 정보를 조회합니다.<br>
                     프로젝트 소유자만 접근 가능합니다.
                 </p>
@@ -1439,7 +1446,7 @@
                     <input type="number" id="history-project-id" placeholder="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 </div>
                 
-                <button onclick="getProjectHistory()" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">히스토리 조회</button>
+                <button onclick="getProjectHistory()" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 32px;">히스토리 조회</button>
                 
                 <div class="code-response-container" style="margin-top: 20px;">
                     <div class="code-section">
@@ -1462,8 +1469,8 @@
                     <span>/api/v1/project/paycheckpoint/paid</span>
                     <button class="url-copy-btn" onclick="copyUrl('/api/v1/project/paycheckpoint/paid')">복사</button>
                 </div>
-                <div class="api-title">지급 체크포인트 지급액수 업데이트</div>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                <div class="api-title" style="font-size: 21.6px;">지급 체크포인트 지급액수 업데이트</div>
+                <p style="color: #666; font-size: 16.8px; margin-bottom: 15px;">
                     지급 체크포인트의 실제 지급액수를 업데이트합니다. 프로젝트 소유자만 사용할 수 있습니다.<br>
                     일부 비용만 지급하는 경우도 처리 가능합니다.
                 </p>
@@ -1505,28 +1512,28 @@
                     <button class="url-copy-btn" onclick="copyUrl('/api/tool/convert_img')">복사</button>
                 </div>
                 
-                <p style="margin: 8px 0 15px 0; color: #666; font-size: 9px; line-height: 1.3;">
+                <p style="margin: 8px 0 15px 0; color: #666; font-size: 18px; line-height: 1.3;">
                     <strong>백엔드 서버 실행할 컴퓨터에 다음 도구들을 사전 설치하시고 cmd와 백엔드 재실행하셔야 합니다:</strong> ImageMagick (<a href="https://imagemagick.org/script/download.php" target="_blank" style="color: #007bff; text-decoration: none;">다운로드</a>) | 
                     GhostScript (<a href="https://ghostscript.com/releases/gsdnld.html" target="_blank" style="color: #007bff; text-decoration: none;">다운로드</a>)
                 </p>
                 
                 <div class="form-group">
-                    <label for="convert-output-format" style="font-size: 12px;">출력 형식:</label>
-                    <select id="convert-output-format" style="width: 80px; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px;">
+                    <label for="convert-output-format" style="font-size: 24px;">출력 형식:</label>
+                    <select id="convert-output-format" style="width: 80px; padding: 4px; border: 1px solid #ddd; border-radius: 3px; font-size: 24px;">
                         <option value="png">PNG</option>
                         <option value="jpg">JPG</option>
                     </select>
                 </div>
                 
                 <div class="form-group" style="margin-bottom: 10px;">
-                    <label style="font-size: 12px; display: flex; align-items: center; width: fit-content;">
+                    <label style="font-size: 24px; display: flex; align-items: center; width: fit-content;">
                         <input type="checkbox" id="convert-keep-temp-files" style="margin-right: 5px;">
                         임시 파일 유지
                     </label>
                 </div>
                 
                 <div class="form-group">
-                    <label style="font-size: 12px;">파일 업로드:</label>
+                    <label style="font-size: 24px;">파일 업로드:</label>
                     <div id="convert-dropzone" style="
                         border: 2px dashed #ccc;
                         border-radius: 6px;
@@ -1537,10 +1544,10 @@
                         transition: border-color 0.3s;
                         position: relative;
                     " onclick="document.getElementById('convert-file-input').click()">
-                        <p style="margin: 0; color: #666; font-size: 13px;">
+                        <p style="margin: 0; color: #666; font-size: 26px;">
                             PSD 또는 AI 파일을 드래그하거나 클릭하여 선택하세요
                         </p>
-                        <p style="margin: 8px 0 0 0; color: #999; font-size: 10px;">
+                        <p style="margin: 8px 0 0 0; color: #999; font-size: 20px;">
                             지원 형식: .psd, .ai
                         </p>
                         <input type="file" id="convert-file-input" accept=".psd,.ai" style="display: none;" onchange="handleConvertFileSelect(event)">
@@ -1548,7 +1555,7 @@
                         <!-- 로딩 애니메이션 -->
                         <div id="convert-loading" style="display: none; margin-top: 15px;">
                             <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                            <p style="margin: 8px 0 0 0; color: #007bff; font-size: 12px;">이미지를 컨버팅 중입니다...</p>
+                            <p style="margin: 8px 0 0 0; color: #007bff; font-size: 24px;">이미지를 컨버팅 중입니다...</p>
                         </div>
                         
                         <img id="convert-result-image" style="max-width: 100%; max-height: 300px; margin-top: 15px; display: none; margin-left: auto; margin-right: auto; border: 1px solid #e0e0e0; border-radius: 4px;" alt="변환 결과">
@@ -1574,8 +1581,8 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:4000/api/v1';
-        const HOST = 'http://localhost:4000';
+        const API_BASE = '/api/v1';//'http://localhost:4000/api/v1';
+        const HOST = '';//'http://localhost:4000';
 
         // 클립보드 복사 함수들
         async function copyCode(elementId) {
@@ -1647,7 +1654,7 @@
                 color: white;
                 padding: 10px 15px;
                 border-radius: 5px;
-                font-size: 14px;
+                font-size: 28px;
                 z-index: 1000;
                 animation: slideIn 0.3s ease-out;
             `;
@@ -1776,7 +1783,7 @@
             // 리비전 조회 필드들
             document.getElementById('revision-info-project-id').addEventListener('input', updateRevisionInfoCode);
             document.getElementById('revision-info-rev-no').addEventListener('input', updateRevisionInfoCode);
-            document.getElementById('revision-info-code').addEventListener('input', updateRevisionInfoCode);
+            document.getElementById('revision-info-invitation-code').addEventListener('input', updateRevisionInfoCode);
 
             // 리비전 서브밋 필드들
             document.getElementById('revision-description').addEventListener('input', updateRevisionSubmitCode);
@@ -2066,7 +2073,7 @@ fetch(host + '/api/v1/revision/new', {
         function updateRevisionInfoCode() {
             const projectId = document.getElementById('revision-info-project-id').value || '1';
             const revNo = document.getElementById('revision-info-rev-no').value || '1';
-            const invitationCode = document.getElementById('revision-info-code').value;
+            const invitationCode = document.getElementById('revision-info-invitation-code').value;
             
             let url = `/api/v1/revision/info?projectId=${projectId}&revNo=${revNo}`;
             if (invitationCode) {
@@ -2363,7 +2370,7 @@ fetch(host + '/api/v1/logout', {
         async function getRevisionInfo() {
             const projectId = document.getElementById('revision-info-project-id').value;
             const revNo = document.getElementById('revision-info-rev-no').value;
-            const invitationCode = document.getElementById('revision-info-code').value;
+            const invitationCode = document.getElementById('revision-info-invitation-code').value;
             
             if (!projectId || !revNo) {
                 alert('프로젝트 ID와 리비전 번호를 입력해주세요.');
@@ -2585,7 +2592,7 @@ fetch(host + '/api/v1/logout', {
                         <div>업로드: ${new Date().toLocaleTimeString()}</div>
                         <div>(신규)</div>
                         <div style="margin-top: 5px;">
-                            <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 10px; padding: 2px 6px;">취소</button>
+                            <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 20px; padding: 2px 6px;">취소</button>
                         </div>
                     </div>
                 `;
@@ -2604,12 +2611,12 @@ fetch(host + '/api/v1/logout', {
                 <div class="track-thumbnail-title">${thumbnail.dataset.trackName || '트랙'}</div>
                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px;">
                     <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                    <p style="margin: 8px 0 0 0; color: #007bff; font-size: 12px;">변환 중...</p>
+                    <p style="margin: 8px 0 0 0; color: #007bff; font-size: 24px;">변환 중...</p>
                 </div>
                 <div class="track-thumbnail-file-info">
                     <div style="font-weight: bold; color: #333;">${file.name}</div>
                     <div style="margin-top: 5px;">
-                        <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 10px; padding: 2px 6px;">취소</button>
+                        <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 20px; padding: 2px 6px;">취소</button>
                     </div>
                 </div>
             `;
@@ -2642,12 +2649,12 @@ fetch(host + '/api/v1/logout', {
                             <img src="${data.fileContent}" class="track-thumbnail-image" alt="${convertedFileName}">
                             <div class="track-thumbnail-file-info">
                                 <div style="font-weight: bold; color: #333;">${convertedFileName}</div>
-                                <div style="font-size: 10px; color: #666;">원본: ${file.name}</div>
+                                <div style="font-size: 20px; color: #666;">원본: ${file.name}</div>
                                 <div>저장: ${new Date(file.lastModified).toLocaleDateString()}</div>
                                 <div>업로드: ${new Date().toLocaleTimeString()}</div>
                                 <div>(변환됨)</div>
                                 <div style="margin-top: 5px;">
-                                    <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 10px; padding: 2px 6px;">취소</button>
+                                    <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 20px; padding: 2px 6px;">취소</button>
                                 </div>
                             </div>
                         `;
@@ -2670,12 +2677,12 @@ fetch(host + '/api/v1/logout', {
                             <div class="track-thumbnail-title">${thumbnail.dataset.trackName || '트랙'}</div>
                             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px; color: #dc3545;">
                                 <div>❌ 변환 실패</div>
-                                <div style="font-size: 10px; margin-top: 5px;">${data.message || '알 수 없는 오류'}</div>
+                                <div style="font-size: 20px; margin-top: 5px;">${data.message || '알 수 없는 오류'}</div>
                             </div>
                             <div class="track-thumbnail-file-info">
                                 <div style="font-weight: bold; color: #333;">${file.name}</div>
                                 <div style="margin-top: 5px;">
-                                    <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 10px; padding: 2px 6px;">취소</button>
+                                    <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 20px; padding: 2px 6px;">취소</button>
                                 </div>
                             </div>
                         `;
@@ -2687,12 +2694,12 @@ fetch(host + '/api/v1/logout', {
                         <div class="track-thumbnail-title">${thumbnail.dataset.trackName || '트랙'}</div>
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px; color: #dc3545;">
                             <div>❌ 변환 실패</div>
-                            <div style="font-size: 10px; margin-top: 5px;">네트워크 오류</div>
+                            <div style="font-size: 20px; margin-top: 5px;">네트워크 오류</div>
                         </div>
                         <div class="track-thumbnail-file-info">
                             <div style="font-weight: bold; color: #333;">${file.name}</div>
                             <div style="margin-top: 5px;">
-                                <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 10px; padding: 2px 6px;">취소</button>
+                                <button class="remove-file" onclick="event.stopPropagation(); removeFile(${trackId})" style="font-size: 20px; padding: 2px 6px;">취소</button>
                             </div>
                         </div>
                     `;
@@ -3084,7 +3091,7 @@ submitRevisionWithFiles()
                                     <div><strong>리비전:</strong> ${feedback.revisionNo} | <strong>트랙:</strong> ${feedback.trackName}</div>
                                     <div><strong>좌표:</strong> (${feedback.normalX}, ${feedback.normalY})</div>
                                     <div style="margin-top: 5px;"><strong>내용:</strong> ${feedback.content}</div>
-                                    <div style="margin-top: 5px; font-size: 12px; color: #666;">
+                                    <div style="margin-top: 5px; font-size: 24px; color: #666;">
                                         생성: ${new Date(feedback.createdAt).toLocaleString()}
                                         ${feedback.updatedAt !== feedback.createdAt ? ' | 수정: ' + new Date(feedback.updatedAt).toLocaleString() : ''}
                                     </div>
